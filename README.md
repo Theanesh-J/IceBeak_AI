@@ -33,13 +33,13 @@ Input (listing, marketing, doc)
 | 1 | [] | Lead, product and pitch | Scope, demo data, slides, demo script, integration decisions | ⬜ |
 | 2 | [name] | Localisation | Module 1: translation and cultural adaptation prompts, NLLB comparison, glossary | ⬜ |
 | 3 | [name] | Regulatory RAG | Module 2: curated law excerpts, retriever, flags with exact citations | ⬜ |
-| 4 | [Harun] | Trust and evaluation | Module 3: trust signals, scoring, eval numbers (FLORES-200 or own test set) | ⬜ |
-| 5 | [Yariel] | Frontend and integration | Module 4: UI, wiring modules together, deployment and backup demo video | ⬜ |
+| 4 | Harun | Trust and evaluation | Module 3: trust signals, scoring, eval numbers (FLORES-200 or own test set) | ⬜ |
+| 5 | Yariel | Frontend and integration | Module 4: UI, wiring modules together, deployment and backup demo video | ⬜ |
 
 Status key: ⬜ not started · 🟨 in progress · 🟩 working with mock data · ✅ integrated
 
 ## Shared data contract
-Every module reads and writes this shape. Don't change it without telling the team.
+Every module reads and writes this shape. Don't change it without telling the team.//to be confirmed
 ```json
 {
   "segment_id": "listing_03",
