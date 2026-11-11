@@ -2,7 +2,7 @@
 
 **Go global. Know what to trust.**
 
-ProofLingo helps a UK small business take a product into a new market. It localises the product listing, marketing copy and product information into German, then **TrustMap** checks every generated statement against the evidence the business actually holds and against curated EU regulatory sources. Each statement is marked as **supported**, **missing evidence / needs review**, or **blocked**, with the reason, the evidence, and the source behind it.
+ProofLingo helps a UK small business take a product into a new market. It localises the product listing, marketing copy and product information into German, then **TrustMap** checks every generated statement against the evidence the business actually holds and against curated EU regulatory sources. Each sentence is coloured **green** (backed by your evidence), **amber** (needs a person to check) or **red** (must be fixed before publishing), with the reason, the evidence and the law behind it.
 
 IEEE Hackathon · Track 2: Scaling Globally with AI (sponsored by the 48 Group).
 
@@ -35,7 +35,7 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173. This starts the web app (Vite, port 5173) and the API server (Express, port 8787). Without an API key the app runs in **Sample scenario** mode, which needs no credentials.
+Open http://localhost:5173. This starts the web app (Vite, port 5173) and the API server (Express, port 8787). Without an API key the app runs in **Sample mode**, which needs no credentials.
 
 | Command | What it does |
 |---|---|
@@ -67,13 +67,13 @@ Start from a clean state. If you have run the app before, click **Start over** i
 
 ---
 
-## Connecting a real LLM (connected AI mode)
+## Connecting a real LLM (Live AI mode)
 
 The API key lives **only on the server**. The browser talks to `/api/*` and never sees the key.
 
 1. Copy `.env.example` to `.env` (`.env` is git-ignored).
 2. Set `ANTHROPIC_API_KEY=...` in `.env`. Optionally set `PROOFLINGO_MODEL`; the default is `claude-opus-5-5`.
-3. Restart `npm run dev`. The server log prints `AI mode connected (...)` and the **Connected AI** option becomes available in Launch Studio.
+3. Restart `npm run dev`. The server log prints `AI mode connected (...)` and the **Live AI** option becomes available in Launch Studio. In TrustMap you also get **Suggest a fix with AI**.
 
 How it works (`server/index.ts`):
 
@@ -91,8 +91,8 @@ How it works (`server/index.ts`):
 **Implemented (real logic running on app state)**
 - Product form, three localised documents, side-by-side comparison and German customer preview.
 - Deterministic TrustMap engine (`src/domain/rules.ts`) with 20 rules. They cover clinical and absolute claims, time-bound results, hydration duration vs measured timepoints, sensory claims vs perception data, ingredient presence and concentration vs INCI and spec, free-from contradictions, medicinal wording, endorsements, suitability, "natural", uniqueness, volume vs declared size, numbers preserved EN↔DE, German text adding claims, untranslated text, brand preservation, and EU market-entry prerequisites.
-- Evidence inspector, reviewer decisions (approve revision, edit manually, escalate, remove), stale-state detection, re-validation with a resolved/new diff.
-- A curated source library with **verbatim excerpts checked against EUR-Lex** (Official Journal versions of Reg. (EU) 655/2013 and Reg. (EC) 1223/2009). Topics without a curated source report **Unable to verify / expert review required**.
+- Plain-language verdicts ("2 statements must be fixed before you publish"), a step-by-step inspector (why it's flagged → what's missing → suggested fix), reviewer actions (approve fix, edit myself, send to specialist, remove), stale-state detection and re-validation showing what the last change fixed.
+- A curated source library with **verbatim excerpts checked against EUR-Lex** (Official Journal versions of Reg. (EU) 655/2013 and Reg. (EC) 1223/2009). Topics without a curated source report **Can't verify** and go to a specialist.
 - Change history, Markdown and JSON report export, and an unchecked-vs-verified comparison computed from the session.
 - Server-side structured LLM generation and revision drafts (needs a key).
 - Local persistence of non-sensitive demo state (`localStorage`).
@@ -116,7 +116,7 @@ src/
   domain/            Pure TypeScript, shared by browser and server
     types.ts         Product, Segment, Finding, ValidationRun…
     sources.ts       Curated regulatory excerpts (verbatim, with URLs). No generated text.
-    sample.ts        SAMPLE SCENARIO data: fictional product, prewritten German, curated revisions
+    sample.ts        SAMPLE MODE data: fictional product, prewritten German, curated fixes
     compose.ts       Sample generation + deterministic regulatory fact lines
     rules.ts         TrustMap rule engine (deterministic, no model)
   state/store.tsx    Reducer: generate → validate → revise → revalidate; history; localStorage
@@ -130,16 +130,16 @@ tests/               node:test suites (run with npm test)
 **Application states**
 
 ```
-empty ──load example / type──▶ product ready ──generate──▶ content v1 + validation (auto)
+start screen ──use example / enter own──▶ product ready ──generate──▶ content v1 + validation (auto)
                                      ▲                         │
                      edit product ───┘ (content marked stale)  ▼
-                                               select statement → inspector
+                                select sentence (or "Fix the first one") → inspector
                                                                │ approve / edit / remove
                                                                ▼
-                                         content v2 (validation stale: "recheck")
+                                         content v2 ("You changed the text." → re-run checks)
                                                                │ re-run checks
                                                                ▼
                                          validation v2 + diff (resolved / new / still open)
 ```
 
-The workflow stepper is derived from state. **Review** completes only when nothing is blocked and every open review item has a reviewer decision, such as escalation to an expert.
+The workflow stepper is derived from state. **Review** completes only when nothing is blocked and every amber item has a reviewer decision, such as "Send to specialist".
