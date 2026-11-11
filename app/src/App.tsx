@@ -7,6 +7,7 @@ import { TrustMapView } from './views/TrustMap';
 import { SourcesView } from './views/Sources';
 import { HistoryView } from './views/History';
 import { getStatus, type ServerStatus } from './lib/api';
+import { HOSTED } from './lib/env';
 import { useStore } from './state/store';
 
 export type Route = 'studio' | 'content' | 'trustmap' | 'sources' | 'history';
@@ -18,7 +19,7 @@ function readRoute(): Route {
 }
 
 export function navigate(route: Route) {
-  window.location.hash = `/${route}`;
+  window.location.hash = route;
 }
 
 const ServerCtx = createContext<{ status: ServerStatus | null; refresh: () => void }>({ status: null, refresh: () => {} });
@@ -31,7 +32,8 @@ export default function App() {
   const { state, dispatch } = useStore();
 
   const refresh = () => {
-    getStatus().then(setStatus);
+    if (HOSTED) setStatus({ reachable: false, configured: false, model: null });
+    else getStatus().then(setStatus);
   };
 
   useEffect(() => {

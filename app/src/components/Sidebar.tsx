@@ -58,7 +58,7 @@ export function Sidebar({ route }: { route: Route }) {
               return (
                 <li key={r}>
                   <a
-                    href={`#/${r}`}
+                    href={`#${r}`}
                     aria-current={active ? 'page' : undefined}
                     className={cx(
                       'flex items-center gap-3 rounded-lg px-3 py-2.5 text-[14px] font-medium transition-colors',

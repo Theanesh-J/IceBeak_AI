@@ -5,6 +5,7 @@ import { generateSampleContent } from '../../../localise/compose';
 import type { EvidenceItem, EvidenceKind, ProductInput } from '../../../data/types';
 import { generateWithAI } from '../lib/api';
 import { useStore } from '../state/store';
+import { HOSTED } from '../lib/env';
 import { splitCounts } from '../../../trust/rules';
 import { Button, Card, Field, STATUS_META, inputCls, cx } from '../components/ui';
 
@@ -379,7 +380,7 @@ function GeneratePanel() {
             {state.mode === 'sample'
               ? 'Uses prewritten German for the example. Works offline, no model runs.'
               : `Writes the German with ${status?.model}. The checks are the same either way.`}
-            {!aiAvailable && status && ' Live AI needs an API key on the server.'}
+            {!aiAvailable && status && (HOSTED ? ' Live AI runs in the local version only.' : ' Live AI needs an API key on the server.')}
           </p>
 
           {state.productChangedSinceGeneration && (

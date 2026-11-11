@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { ArrowDown, ChevronDown, Download, FileJson, History as HistoryIcon, Package, PencilLine, ScanSearch, Send, Sparkles } from 'lucide-react';
+import { ArrowDown, Check, ChevronDown, Copy, Download, FileJson, History as HistoryIcon, Package, PencilLine, ScanSearch, Send, Sparkles } from 'lucide-react';
 import { navigate } from '../App';
 import { splitCounts } from '../../../trust/rules';
 import type { HistoryEntry } from '../../../data/types';
 import { buildMarkdownReport, download } from '../lib/report';
 import { isStale, useStore } from '../state/store';
 import { Button, Card, EmptyState, cx, formatTime } from '../components/ui';
+import { HOSTED } from '../lib/env';
 
 const ICON: Record<HistoryEntry['type'], { Icon: typeof Sparkles; tone: string }> = {
   'product-loaded': { Icon: Package, tone: 'bg-fill text-ink-2' },
@@ -50,6 +51,9 @@ export function HistoryView() {
             <p className="text-[14px] font-medium text-muted">Your review so far</p>
             <h2 className="mt-2 text-[22px] font-semibold tracking-tight text-ink sm:text-[26px]">{state.product.name || 'Product'}</h2>
           </div>
+          {HOSTED ? (
+            <CopyReport disabled={!canExport} text={() => buildMarkdownReport(state)} />
+          ) : (
           <div className="flex gap-2">
             <Button variant="primary" size="lg" disabled={!canExport} onClick={() => download(`prooflingo-${slug}-review.md`, buildMarkdownReport(state), 'text/markdown')}>
               <Download size={17} aria-hidden /> Download report
@@ -70,6 +74,7 @@ export function HistoryView() {
               <FileJson size={17} aria-hidden />
             </Button>
           </div>
+          )}
         </div>
         <dl className="mt-6 grid grid-cols-3 gap-3">
           {[
@@ -187,5 +192,44 @@ function Comparison() {
         </div>
       </div>
     </Card>
+  );
+}
+
+/** Hosted pages can't start downloads, so the report is copied instead. */
+function CopyReport({ text, disabled }: { text: () => string; disabled: boolean }) {
+  const [state, setState] = useState<'idle' | 'copied' | 'shown'>('idle');
+  const [fallback, setFallback] = useState('');
+  return (
+    <div className="flex max-w-full flex-col items-end gap-2">
+      <Button
+        variant="primary"
+        size="lg"
+        disabled={disabled}
+        onClick={() => {
+          const t = text();
+          navigator.clipboard
+            .writeText(t)
+            .then(() => setState('copied'))
+            .catch(() => {
+              setFallback(t);
+              setState('shown');
+            });
+        }}
+      >
+        {state === 'copied' ? <Check size={17} aria-hidden /> : <Copy size={17} aria-hidden />}
+        {state === 'copied' ? 'Report copied' : 'Copy report'}
+      </Button>
+      {state === 'shown' && (
+        <textarea
+          id="report-text"
+          readOnly
+          rows={6}
+          className="w-full max-w-md rounded-lg border border-line bg-fill p-2 font-mono text-[11.5px]"
+          value={fallback}
+          onFocus={(e) => e.currentTarget.select()}
+          aria-label="Report text: select and copy"
+        />
+      )}
+    </div>
   );
 }
