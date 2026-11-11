@@ -31,7 +31,7 @@ Input (listing, marketing, doc)
 | # | Name | Role | Owns | Status |
 |---|------|------|------|--------|
 | 1 | [] | Lead, product and pitch | Scope, demo data, slides, demo script, integration decisions | ⬜ |
-| 2 | [name] | Localisation | Module 1: translation and cultural adaptation prompts, NLLB comparison, glossary | ⬜ |
+| 2 | Theanesh | Localisation | Module 1: translation and cultural adaptation prompts, NLLB comparison, glossary | ⬜ |
 | 3 | Adil | Regulatory RAG | Module 2: curated law excerpts, retriever, flags with exact citations | ⬜ |
 | 4 | Harun | Trust and evaluation | Module 3: trust signals, scoring, eval numbers (FLORES-200 or own test set) | ⬜ |
 | 5 | Yariel | Frontend and integration | Module 4: UI, wiring modules together, deployment and backup demo video | ⬜ |
