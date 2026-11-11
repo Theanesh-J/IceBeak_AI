@@ -1,0 +1,75 @@
+
+[
+  {
+    "reg_id": "REG-001",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Regulation (EU) No 655/2013",
+    "citation": "Annex, Criterion 3",
+    "topic": "evidential_support",
+    "rule": "Cosmetic product claims must be supported by adequate and verifiable evidence.",
+    "check": "Does the claim make a specific statement without supporting evidence?",
+    "source_url": "https://www.legislation.gov.uk/eur/2013/655/annex",
+    "severity": "high"
+  },
+  {
+    "reg_id": "REG-002",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Regulation (EC) No 1223/2009",
+    "citation": "Article 20(1)",
+    "topic": "misleading_claims",
+    "rule": "Cosmetic marketing must not imply characteristics or functions that the product does not have.",
+    "check": "Does the claim promise an unsupported product benefit?",
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2009/1223/2024-04-04/eng",
+    "severity": "high"
+  },
+  {
+    "reg_id": "REG-003",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Regulation (EU) No 655/2013",
+    "citation": "Annex, Criterion 2",
+    "topic": "ingredient_truthfulness",
+    "rule": "Claimed ingredients must be deliberately present in the cosmetic product.",
+    "check": "Does the claim mention an ingredient that is absent from the verified ingredient list?",
+    "source_url": "https://www.legislation.gov.uk/eur/2013/655/annex",
+    "severity": "high"
+  },
+  {
+    "reg_id": "REG-004",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Directive 2005/29/EC",
+    "citation": "Article 6",
+    "topic": "misleading_advertising",
+    "rule": "False or deceptive information about product characteristics may constitute a misleading commercial practice.",
+    "check": "Could the statement mislead consumers about the product?",
+    "source_url": "https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX:32005L0029",
+    "severity": "high"
+  },
+  {
+    "reg_id": "REG-005",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Regulation (EC) No 1223/2009",
+    "citation": "Article 19(5)",
+    "topic": "french_labelling",
+    "rule": "Specified mandatory cosmetic label information must be provided in French.",
+    "check": "Is mandatory label information missing from the French-language version?",
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2009/1223/2024-04-04/eng",
+    "severity": "high"
+  },
+  {
+    "reg_id": "REG-006",
+    "market": "France",
+    "product": "cosmetics",
+    "law": "Regulation (EC) No 1223/2009",
+    "citation": "Article 3",
+    "topic": "product_safety",
+    "rule": "Cosmetic products must be safe for human health under normal or reasonably foreseeable conditions of use.",
+    "check": "Does the product description suggest a potentially unsafe use?",
+    "source_url": "https://eur-lex.europa.eu/eli/reg/2009/1223/2024-04-04/eng",
+    "severity": "high"
+  }
+]
