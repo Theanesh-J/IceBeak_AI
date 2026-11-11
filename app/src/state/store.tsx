@@ -190,13 +190,14 @@ function reducer(state: AppState, action: Action): AppState {
       });
       const decisions = { ...state.decisions };
       for (const id of action.findingIds) decisions[id] = { decision: action.decision, note: action.note, at: now() };
-      return {
+      // Every change is checked again straight away by the same deterministic rules.
+      return runValidation({
         ...state,
         content: { ...state.content, segments },
         contentVersion: state.contentVersion + 1,
         decisions,
         history: [...entries.reverse(), ...state.history],
-      };
+      });
     }
     case 'removeSegment': {
       if (!state.content) return state;
@@ -204,7 +205,7 @@ function reducer(state: AppState, action: Action): AppState {
       if (!seg) return state;
       const decisions = { ...state.decisions };
       for (const id of action.findingIds) decisions[id] = { decision: 'revision-applied', note: 'Statement removed', at: now() };
-      return {
+      return runValidation({
         ...state,
         content: { ...state.content, segments: state.content.segments.filter((s) => s.id !== action.segmentId) },
         contentVersion: state.contentVersion + 1,
@@ -224,7 +225,7 @@ function reducer(state: AppState, action: Action): AppState {
           },
           ...state.history,
         ],
-      };
+      });
     }
     case 'decide': {
       const decisions = { ...state.decisions };

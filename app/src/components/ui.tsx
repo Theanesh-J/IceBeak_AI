@@ -14,15 +14,17 @@ export function Button({
   className,
   children,
   ...rest
-}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: 'sm' | 'md' }) {
+}: ButtonHTMLAttributes<HTMLButtonElement> & { variant?: Variant; size?: 'sm' | 'md' | 'lg' }) {
   return (
     <button
       {...rest}
       className={cx(
-        'inline-flex items-center justify-center gap-1.5 rounded-md font-medium whitespace-nowrap transition-colors duration-150 disabled:cursor-not-allowed disabled:opacity-50',
-        size === 'sm' ? 'h-8 px-2.5 text-[13px]' : 'h-9 px-3.5 text-sm',
+        'inline-flex items-center justify-center gap-2 font-semibold whitespace-nowrap transition-all duration-150 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100',
+        size === 'sm' && 'h-8 rounded-lg px-3 text-[13px]',
+        size === 'md' && 'h-10 rounded-lg px-4 text-[14px]',
+        size === 'lg' && 'h-12 rounded-xl px-5 text-[15px]',
         variant === 'primary' && 'bg-teal text-white hover:bg-teal-ink shadow-sm',
-        variant === 'secondary' && 'border border-line-2 bg-surface text-ink hover:bg-canvas',
+        variant === 'secondary' && 'bg-[#eef0ec] text-ink hover:bg-[#e4e7e2]',
         variant === 'ghost' && 'text-ink-2 hover:bg-black/5',
         variant === 'danger' && 'border border-bad-line bg-surface text-bad hover:bg-bad-soft',
         className,
@@ -34,7 +36,7 @@ export function Button({
 }
 
 export function Card({ className, children }: { className?: string; children: ReactNode }) {
-  return <div className={cx('rounded-xl border border-line bg-surface', className)}>{children}</div>;
+  return <div className={cx('rounded-2xl border border-line/80 bg-surface shadow-[0_1px_2px_rgba(23,33,43,0.04)]', className)}>{children}</div>;
 }
 
 export function SectionTitle({ title, hint, action }: { title: string; hint?: ReactNode; action?: ReactNode }) {
@@ -49,33 +51,40 @@ export function SectionTitle({ title, hint, action }: { title: string; hint?: Re
   );
 }
 
-export const STATUS_META: Record<EvidenceStatus | 'none', { label: string; short: string; tone: string; dot: string; Icon: typeof CircleCheck }> = {
+export const STATUS_META: Record<
+  EvidenceStatus | 'none',
+  { label: string; short: string; tone: string; dot: string; soft: string; Icon: typeof CircleCheck }
+> = {
   supported: {
     label: 'Backed by your evidence',
-    short: 'Supported',
+    short: 'Backed by evidence',
     tone: 'bg-ok-soft text-ok border-ok-line',
     dot: 'bg-ok',
+    soft: 'bg-ok-soft text-ok',
     Icon: CircleCheck,
   },
   review: {
     label: 'A person needs to check this',
-    short: 'Needs review',
+    short: 'Needs an expert',
     tone: 'bg-warn-soft text-warn border-warn-line',
     dot: 'bg-[#d08a14]',
+    soft: 'bg-warn-soft text-warn',
     Icon: CircleAlert,
   },
   blocked: {
     label: 'Must be fixed before publishing',
-    short: 'Blocked',
+    short: 'Must fix',
     tone: 'bg-bad-soft text-bad border-bad-line',
     dot: 'bg-bad',
+    soft: 'bg-bad-soft text-bad',
     Icon: OctagonX,
   },
   none: {
     label: 'Nothing to check',
-    short: 'No claim',
+    short: 'Nothing to check',
     tone: 'bg-canvas text-muted border-line',
     dot: 'bg-line-2',
+    soft: 'bg-canvas text-muted',
     Icon: Minus,
   },
 };

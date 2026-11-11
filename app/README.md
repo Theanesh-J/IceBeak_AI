@@ -61,13 +61,11 @@ Start from a clean state. If you have run the app before, click **Start over** i
 |---|---|---|
 | 0:00 | **Launch Studio** shows the start screen. | One sentence says what the tool does. The badge next to the title says **Sample mode**, so we never pretend a model is running. |
 | 0:10 | Click **Use the example product**. | The product summary lists the claims and the evidence. The business has hydration, perception and formula data, plus a *UK* safety report, but **no clinical study**. |
-| 0:20 | Click **Generate German content**. | The result card says **"2 statements must be fixed before you publish."** The rules ran immediately; no model judged its own output. |
-| 0:30 | Click **Review and fix**. | The TrustMap verdict repeats the headline. Every sentence is coloured red, amber or green. Toggle *German / English*. |
-| 0:40 | Click **Fix the first one**. | The inspector shows the German sentence with the problem words highlighted, **why it's flagged** (no clinical study), and **what's missing**. Open **Evidence and law** to show the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
-| 0:55 | Under **Suggested fix**, keep "Also fix the same claim in Marketing" ticked and click **Approve fix**. | The verdict changes to **"You changed the text."** Results are marked out of date, not silently updated. |
-| 1:05 | Click **Re-run checks**. | **"Nothing is blocked." "Last change fixed 6 problems."** The new sentence is green, backed by the consumer perception test. Fixed is not legal approval. |
-| 1:15 | Click the **Product information** tab. | The EU Responsible Person, EU safety report and CPNP notification are **still amber**, and German label rules say **Can't verify**. Fixing the claim didn't make unrelated gaps disappear. |
-| 1:25 | **Review History**. | Before/after text for each fix, and the *unchecked vs TrustMap* table. Use **Markdown report** to export. |
+| 0:20 | Click **Generate German content**, then **Review and fix**. | TrustMap opens like a banking app: a big **"2 sentences to fix"**, a progress bar across all 21 sentences, and a to-do list grouped into *Must fix*, *Needs an expert* and *Backed by evidence*. The rules ran instantly; no model judged its own output. |
+| 0:35 | Click **Fix next**. | The detail panel shows the German sentence with the problem words highlighted, **What's wrong** ("It says clinically proven, but you have no clinical study") and **What's missing**. Open **What the law says** for the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
+| 0:55 | Keep "Also fix the same claim in Marketing" ticked and tap **Use this fix**. | The checks re-run automatically: **"Fixed and checked again"**, the headline flips to **"Nothing to fix"**, and "Checked again: 6 problems fixed". Fixed means the check passes; it isn't legal approval. |
+| 1:10 | Tap **Next item**, then **Send to an expert**. | Items the evidence can't settle (sensitive skin, EU Responsible Person, safety report, CPNP, German label rules) **stay amber** and go to a human. Fixing one claim didn't hide the other gaps. |
+| 1:20 | Switch to **Full document**, then open **Review History**. | The document view shows the highlighted German text. History shows before/after for each fix and the *unchecked vs TrustMap* table. Use **Markdown report** to export. |
 
 ---
 
@@ -95,7 +93,7 @@ How it works (`server/index.ts`):
 **Implemented (real logic running on app state)**
 - Product form, three localised documents, side-by-side comparison and German customer preview.
 - Deterministic TrustMap engine (`/trust/rules.ts`) with 20 rules. They cover clinical and absolute claims, time-bound results, hydration duration vs measured timepoints, sensory claims vs perception data, ingredient presence and concentration vs INCI and spec, free-from contradictions, medicinal wording, endorsements, suitability, "natural", uniqueness, volume vs declared size, numbers preserved EN↔DE, German text adding claims, untranslated text, brand preservation, and EU market-entry prerequisites.
-- Plain-language verdicts ("2 statements must be fixed before you publish"), a step-by-step inspector (why it's flagged → what's missing → suggested fix), reviewer actions (approve fix, edit myself, send to specialist, remove), stale-state detection and re-validation showing what the last change fixed.
+- A review screen built like a banking app: summary card ("2 sentences to fix") with a progress bar, a to-do list grouped by urgency, and a detail panel (a bottom sheet on phones) that goes what's wrong → what's missing → suggested fix. Actions: use this fix, edit myself, send to an expert, remove. Every change is re-checked automatically, and the screen shows what it fixed.
 - A curated source library with **verbatim excerpts checked against EUR-Lex** (Official Journal versions of Reg. (EU) 655/2013 and Reg. (EC) 1223/2009). Topics without a curated source report **Can't verify** and go to a specialist.
 - Change history, Markdown and JSON report export, and an unchecked-vs-verified comparison computed from the session.
 - Server-side structured LLM generation and revision drafts (needs a key).
@@ -134,16 +132,14 @@ IceBeak_AI/
 **Application states**
 
 ```
-start screen ──use example / enter own──▶ product ready ──generate──▶ content v1 + validation (auto)
-                                     ▲                         │
-                     edit product ───┘ (content marked stale)  ▼
-                                select sentence (or "Fix the first one") → inspector
-                                                               │ approve / edit / remove
-                                                               ▼
-                                         content v2 ("You changed the text." → re-run checks)
-                                                               │ re-run checks
-                                                               ▼
-                                         validation v2 + diff (resolved / new / still open)
+start screen ──use example / enter own──▶ product ready ──generate──▶ content v1 + check (automatic)
+                                     ▲                                    │
+                     edit product ───┘ (content marked out of date)       ▼
+                                          summary + to-do list → pick item ("Fix next") → detail panel
+                                                                          │ use fix / edit / remove
+                                                                          ▼
+                                       content v2 + check again (automatic) → "Fixed and checked again"
+                                                                          │ next item / send to an expert
 ```
 
 The workflow stepper is derived from state. **Review** completes only when nothing is blocked and every amber item has a reviewer decision, such as "Send to specialist".

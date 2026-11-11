@@ -67,10 +67,10 @@ function StartPanel({ onExample, onOwn }: { onExample: () => void; onOwn: () => 
         ProofLingo writes your German content, then marks each sentence green, amber or red depending on whether your evidence supports it.
       </p>
       <div className="mt-8 flex flex-wrap gap-3">
-        <Button variant="primary" className="h-11 px-5 text-[15px]" onClick={onExample}>
+        <Button variant="primary" size="lg" onClick={onExample}>
           Use the example product <ArrowRight size={16} aria-hidden />
         </Button>
-        <Button className="h-11 px-5 text-[15px]" onClick={onOwn}>
+        <Button size="lg" onClick={onOwn}>
           Enter my own product
         </Button>
       </div>
@@ -331,7 +331,7 @@ function GeneratePanel() {
               </li>
             ))}
           </ul>
-          <Button variant="primary" className="mt-6 h-11 w-full text-[15px]" onClick={() => navigate('trustmap')}>
+          <Button variant="primary" size="lg" className="mt-6 w-full" onClick={() => navigate('trustmap')}>
             {counts.blocked > 0 ? 'Review and fix' : 'Review results'} <ArrowRight size={16} aria-hidden />
           </Button>
           <div className="mt-2 flex gap-2">
@@ -390,7 +390,7 @@ function GeneratePanel() {
             </p>
           )}
 
-          <Button variant="primary" className="mt-5 h-11 w-full text-[15px]" disabled={!ready || busy} onClick={generate}>
+          <Button variant="primary" size="lg" className="mt-5 w-full" disabled={!ready || busy} onClick={generate}>
             {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
             {busy ? `Writing with ${status?.model}…` : 'Generate German content'}
           </Button>
