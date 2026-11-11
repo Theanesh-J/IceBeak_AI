@@ -1,11 +1,9 @@
 import { useState, type KeyboardEvent } from 'react';
-import { ArrowRight, ChevronRight, Columns2, Eye, Languages } from 'lucide-react';
-import { navigate } from '../App';
+import { ChevronRight } from 'lucide-react';
 import type { DocType, Segment } from '../../../data/types';
 import { segmentStatus } from '../../../trust/rules';
 import { SAMPLE_COMPANY } from '../../../data/sample';
-import { isStale, useStore } from '../state/store';
-import { Button, Card, EmptyState, STATUS_META, cx } from '../components/ui';
+import { Card, STATUS_META, cx } from '../components/ui';
 
 export const DOC_TABS: Array<{ key: DocType; label: string }> = [
   { key: 'listing', label: 'Listing' },
@@ -49,109 +47,7 @@ export function DocTabs({ value, onChange, counts }: { value: DocType; onChange:
   );
 }
 
-export function LocalisedContentView() {
-  const { state, dispatch } = useStore();
-  const [tab, setTab] = useState<DocType>('listing');
-  const [view, setView] = useState<'compare' | 'preview'>('compare');
-
-  if (!state.content) {
-    return (
-      <EmptyState
-        icon={<Languages size={18} />}
-        title="No German content yet"
-        body="Set up your product in Launch Studio and create the German version to compare it here."
-        action={
-          <Button variant="primary" onClick={() => navigate('studio')}>
-            Go to Launch Studio
-          </Button>
-        }
-      />
-    );
-  }
-
-  const findings = state.validation?.findings ?? [];
-  const status = (id: string) => (state.validation ? segmentStatus(findings, id) : 'none');
-  const all = state.content.segments;
-  const segs = all.filter((s) => s.docType === tab);
-  const toFix = (d: DocType) => all.filter((s) => s.docType === d && status(s.id) === 'blocked').length;
-  const inspect = (id: string) => {
-    dispatch({ type: 'select', segmentId: id });
-    navigate('trustmap');
-  };
-  const showPreview = tab === 'listing' && view === 'preview';
-
-  return (
-    <div className="space-y-6">
-      {/* Summary */}
-      <Card className="p-6 sm:p-7">
-        <p className="text-[14px] font-medium text-muted">Your German content</p>
-        <div className="mt-2 flex flex-wrap items-end justify-between gap-4">
-          <h2 className="text-[22px] font-semibold tracking-tight text-ink sm:text-[26px]">
-            {all.length} sentences in 3 documents
-          </h2>
-          <Button variant="primary" size="lg" onClick={() => navigate('trustmap')}>
-            Review and fix <ArrowRight size={17} aria-hidden />
-          </Button>
-        </div>
-        <p className="mt-2 text-[15px] text-ink-2">
-          {state.content.mode === 'ai' ? `Written by ${state.content.model}.` : 'Prewritten example text, no model involved.'} Regulatory lines come from your product facts.
-        </p>
-        {isStale(state) && (
-          <p className="mt-4 rounded-xl bg-warn-soft px-4 py-3 text-[14px] text-warn">Some text changed since the last check, so the labels below may be out of date.</p>
-        )}
-      </Card>
-
-      {/* Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <DocTabs value={tab} onChange={setTab} counts={{ listing: toFix('listing'), marketing: toFix('marketing'), info: toFix('info') }} />
-        {tab === 'listing' && (
-          <div className="inline-flex rounded-xl bg-fill p-1" role="group" aria-label="View">
-            {(
-              [
-                ['compare', 'Compare', Columns2],
-                ['preview', 'Shop preview', Eye],
-              ] as const
-            ).map(([v, label, Icon]) => (
-              <button
-                key={v}
-                aria-pressed={view === v}
-                onClick={() => setView(v)}
-                className={cx(
-                  'flex items-center gap-2 rounded-lg px-3.5 py-1.5 text-[14px] font-semibold transition-colors',
-                  view === v ? 'bg-surface text-ink shadow-sm' : 'text-muted hover:text-ink',
-                )}
-              >
-                <Icon size={15} aria-hidden /> {label}
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
-
-      {showPreview ? (
-        <ShopPreview segments={segs} status={status} onInspect={inspect} inci={all.find((s) => s.id === 'pi-inci')?.de} />
-      ) : (
-        <Card className="overflow-hidden" >
-          <div role="tabpanel" aria-labelledby={`tab-${tab}`}>
-            <div className="hidden grid-cols-[minmax(0,1fr)_minmax(0,1fr)_28px] gap-6 border-b border-line px-6 py-3 text-[12.5px] font-medium text-muted md:grid">
-              <span>English · what you wrote</span>
-              <span>German · what customers read</span>
-              <span />
-            </div>
-            <ul>
-              {segs.map((s, i) => (
-                <Row key={s.id} seg={s} status={status(s.id)} first={i === 0} onOpen={() => inspect(s.id)} />
-              ))}
-              {segs.length === 0 && <li className="px-6 py-12 text-center text-[14px] text-muted">Nothing in this document.</li>}
-            </ul>
-          </div>
-        </Card>
-      )}
-    </div>
-  );
-}
-
-function Row({ seg, status, first, onOpen }: { seg: Segment; status: ReturnType<typeof segmentStatus>; first: boolean; onOpen: () => void }) {
+export function CompareRow({ seg, status, first, onOpen }: { seg: Segment; status: ReturnType<typeof segmentStatus>; first: boolean; onOpen: () => void }) {
   const m = STATUS_META[status];
   return (
     <li className={cx(!first && 'border-t border-line')}>
@@ -193,7 +89,7 @@ function Statement({ s, overlay, status, onInspect }: { s?: Segment; overlay: bo
   );
 }
 
-function ShopPreview({
+export function ShopPreview({
   segments,
   status,
   onInspect,

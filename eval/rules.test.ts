@@ -114,3 +114,18 @@ test('inflected German claim words are detected (model adds "dermatologisch gete
   assert.equal(f.find((x) => x.ruleId === 'R15')?.status, 'blocked');
   assert.equal(f.find((x) => x.ruleId === 'R01')?.status, 'blocked');
 });
+
+test('wording problems are split from launch prerequisites', async () => {
+  const { splitCounts, launchSteps } = await import('../trust/rules.ts');
+  const p = product();
+  const content = generateSampleContent(p);
+  const { findings } = validate(p, content);
+  const c = splitCounts(findings, content.segments);
+  assert.equal(c.blocked, 2); // clinical claim in listing + marketing
+  assert.equal(c.review, 3); // sensitive skin, fragrance-free, naturally derived
+  assert.deepEqual(
+    launchSteps(findings, content.segments).map((s) => s.key),
+    ['responsiblePerson', 'safetyReport', 'notification', 'R20'],
+  );
+  assert.equal(c.launchOpen, 4);
+});

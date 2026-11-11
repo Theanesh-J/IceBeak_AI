@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { ArrowDown, ChevronDown, Download, FileJson, History as HistoryIcon, Package, PencilLine, ScanSearch, Send, Sparkles } from 'lucide-react';
 import { navigate } from '../App';
-import { summarise } from '../../../trust/rules';
+import { splitCounts } from '../../../trust/rules';
 import type { HistoryEntry } from '../../../data/types';
 import { buildMarkdownReport, download } from '../lib/report';
 import { isStale, useStore } from '../state/store';
@@ -157,7 +157,7 @@ function Comparison() {
   const { state } = useStore();
   if (!state.baseline || !state.validation || !state.content) return null;
   const b = state.baseline;
-  const now = summarise(state.validation.findings, state.content.segments);
+  const now = splitCounts(state.validation.findings, state.content.segments);
   return (
     <Card className="self-start p-6">
       <h3 className="text-[16px] font-semibold text-ink">What ProofLingo changed</h3>
@@ -182,7 +182,7 @@ function Comparison() {
             <span className="text-[22px] font-semibold tabular-nums text-ink">{now.blocked}</span> {now.blocked === 1 ? 'sentence' : 'sentences'} still to fix
           </p>
           <p className="mt-1 text-[15px] text-ink">
-            <span className="text-[22px] font-semibold tabular-nums text-ink">{now.review}</span> flagged for an expert, not hidden
+            <span className="text-[22px] font-semibold tabular-nums text-ink">{now.review + now.launchOpen}</span> flagged for an expert, not hidden
           </p>
         </div>
       </div>

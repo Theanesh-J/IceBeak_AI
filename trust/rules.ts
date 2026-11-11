@@ -652,3 +652,61 @@ export function summarise(findings: Finding[], segments: Segment[]) {
   return counts;
 }
 
+
+// ---------- wording vs launch prerequisites ----------
+//
+// Two different jobs hide in the findings:
+//   wording – something in a sentence the business can rewrite
+//   launch  – a business prerequisite for selling in the market (Responsible
+//             Person, safety report, notification, national label rules).
+// They are split so the UI can show "fix your wording" separately from
+// "before you can sell in Germany".
+
+export const isLaunchFinding = (f: Finding) => f.category === 'Market entry prerequisite';
+
+/** Status of a sentence counting only wording findings. */
+export function wordingStatus(findings: Finding[], segmentId: string): EvidenceStatus | 'none' {
+  return segmentStatus(
+    findings.filter((f) => !isLaunchFinding(f)),
+    segmentId,
+  );
+}
+
+export interface LaunchStep {
+  key: string;
+  title: string;
+  done: boolean;
+  findings: Finding[];
+  segmentId: string;
+}
+
+const LAUNCH_TITLES: Record<string, string> = {
+  responsiblePerson: 'Appoint an EU Responsible Person',
+  safetyReport: 'Get an EU safety assessment',
+  notification: 'Register the product on CPNP',
+  R20: 'Confirm German label-language rules',
+};
+
+/** Launch prerequisites, one step per topic, in a stable order. */
+export function launchSteps(findings: Finding[], segments: Segment[]): LaunchStep[] {
+  const steps = new Map<string, LaunchStep>();
+  for (const f of findings.filter(isLaunchFinding)) {
+    const seg = segments.find((s) => s.id === f.segmentId);
+    const key = f.ruleId === 'R18' ? (seg?.factKey ?? f.segmentId) : f.ruleId;
+    const step = steps.get(key) ?? { key, title: LAUNCH_TITLES[key] ?? f.title, done: true, findings: [], segmentId: f.segmentId };
+    step.findings.push(f);
+    if (f.status !== 'supported') step.done = false;
+    steps.set(key, step);
+  }
+  const order = ['responsiblePerson', 'safetyReport', 'notification', 'R20'];
+  const rank = (k: string) => (order.includes(k) ? order.indexOf(k) : order.length);
+  return [...steps.values()].sort((a, b) => rank(a.key) - rank(b.key));
+}
+
+/** Counts for summaries: wording by sentence, launch by step. */
+export function splitCounts(findings: Finding[], segments: Segment[]) {
+  const wording = { supported: 0, review: 0, blocked: 0, none: 0 };
+  for (const s of segments) wording[wordingStatus(findings, s.id)]++;
+  const steps = launchSteps(findings, segments);
+  return { ...wording, launchOpen: steps.filter((s) => !s.done).length, launchTotal: steps.length };
+}

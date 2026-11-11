@@ -5,7 +5,7 @@ import { generateSampleContent } from '../../../localise/compose';
 import type { EvidenceItem, EvidenceKind, ProductInput } from '../../../data/types';
 import { generateWithAI } from '../lib/api';
 import { useStore } from '../state/store';
-import { summarise } from '../../../trust/rules';
+import { splitCounts } from '../../../trust/rules';
 import { Button, Card, Field, STATUS_META, inputCls, cx } from '../components/ui';
 
 export const EVIDENCE_KINDS: Array<{ value: EvidenceKind; label: string }> = [
@@ -55,7 +55,7 @@ function StartPanel({ onExample, onOwn }: { onExample: () => void; onOwn: () => 
   const steps = [
     ['Describe your product', 'Its claims, ingredients and the evidence you can actually show.'],
     ['Get the German version', 'Product listing, marketing copy and product information.'],
-    ['See what you can trust', 'Every statement is checked against your evidence and EU cosmetics law.'],
+    ['See what you can trust', 'Every sentence is checked against your evidence and EU cosmetics law.'],
   ];
   return (
     <Card className="mx-auto max-w-4xl px-6 py-10 sm:px-12 sm:py-14">
@@ -292,7 +292,7 @@ function GeneratePanel() {
   const [error, setError] = useState<string | null>(null);
   const ready = !!p.name.trim() && !!p.size.trim() && p.claims.some((c) => c.trim());
   const aiAvailable = !!status?.configured;
-  const counts = state.content && state.validation ? summarise(state.validation.findings, state.content.segments) : null;
+  const counts = state.content && state.validation ? splitCounts(state.validation.findings, state.content.segments) : null;
   const fresh = counts && !state.productChangedSinceGeneration;
 
   async function generate() {
@@ -318,25 +318,28 @@ function GeneratePanel() {
         <div className="fade-in">
           <p className="text-[13px] font-medium text-muted">German content ready</p>
           <h2 className="mt-1 text-[20px] font-semibold leading-snug tracking-tight">
-            {counts.blocked > 0
-              ? `${counts.blocked} statement${counts.blocked > 1 ? 's' : ''} must be fixed before you publish.`
-              : 'Nothing is blocked.'}
+            {counts.blocked > 0 ? `${counts.blocked} sentence${counts.blocked > 1 ? 's' : ''} to fix before you publish.` : 'Nothing to fix.'}
           </h2>
           <ul className="mt-4 space-y-2 text-[14px]">
             {(['blocked', 'review', 'supported'] as const).map((s) => (
               <li key={s} className="flex items-center gap-2.5">
                 <span className={cx('h-2.5 w-2.5 rounded-full', STATUS_META[s].dot)} aria-hidden />
                 <span className="w-6 font-semibold tabular-nums">{counts[s]}</span>
-                <span className="text-ink-2">{STATUS_META[s].label}</span>
+                <span className="text-ink-2">{STATUS_META[s].short}</span>
               </li>
             ))}
+            <li className="flex items-center gap-2.5">
+              <span className="h-2.5 w-2.5 rounded-full border-2 border-line-2" aria-hidden />
+              <span className="w-6 font-semibold tabular-nums">{counts.launchOpen}</span>
+              <span className="text-ink-2">Launch steps to sort</span>
+            </li>
           </ul>
           <Button variant="primary" size="lg" className="mt-6 w-full" onClick={() => navigate('trustmap')}>
-            {counts.blocked > 0 ? 'Review and fix' : 'Review results'} <ArrowRight size={16} aria-hidden />
+            {counts.blocked > 0 ? 'Review and fix' : 'Review'} <ArrowRight size={16} aria-hidden />
           </Button>
           <div className="mt-2 flex gap-2">
             <Button className="flex-1" onClick={() => navigate('content')}>
-              Compare English / German
+              See side by side
             </Button>
             <Button variant="ghost" onClick={generate} disabled={busy} title="Generate again">
               {busy ? <Loader2 size={14} className="animate-spin" aria-hidden /> : <RotateCcw size={14} aria-hidden />}

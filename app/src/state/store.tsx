@@ -1,6 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, type Dispatch, type ReactNode } from 'react';
 import type {
-  EvidenceStatus,
   Finding,
   GenerationMode,
   HistoryEntry,
@@ -10,7 +9,7 @@ import type {
   ValidationRun,
 } from '../../../data/types';
 import { SAMPLE_PRODUCT } from '../../../data/sample';
-import { summarise, validate } from '../../../trust/rules';
+import { splitCounts, summarise, validate } from '../../../trust/rules';
 
 export interface Decision {
   decision: ReviewerDecision;
@@ -93,13 +92,12 @@ function runValidation(state: AppState): AppState {
   const prevOpenIds = new Set(prevOpen.map((f) => f.id));
   const resolved = prevOpen.filter((f) => !nextOpenIds.has(f.id));
   const added = state.validation ? nextOpen.filter((f) => !prevOpenIds.has(f.id)) : [];
-  const byStatement = summarise(findings, state.content.segments);
-  const count = (s: EvidenceStatus) => byStatement[s];
+  const c = splitCounts(findings, state.content.segments);
   const entry: HistoryEntry = {
     id: uid(),
     at: run.ranAt,
     type: 'validation',
-    summary: `${state.validation ? 'Checked again' : `Checked ${run.segmentCount} sentences`} · ${count('blocked')} to fix, ${count('review')} for an expert, ${count('supported')} backed by evidence`,
+    summary: `${state.validation ? 'Checked again' : `Checked ${run.segmentCount} sentences`} · ${c.blocked} to fix, ${c.review} for an expert, ${c.launchOpen} launch steps open`,
     resolved: resolved.map((f) => f.id),
     stillOpen: nextOpen.length,
   };

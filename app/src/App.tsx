@@ -3,7 +3,6 @@ import { Menu, X } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Header } from './components/Header';
 import { LaunchStudio } from './views/LaunchStudio';
-import { LocalisedContentView } from './views/LocalisedContent';
 import { TrustMapView } from './views/TrustMap';
 import { SourcesView } from './views/Sources';
 import { HistoryView } from './views/History';
@@ -91,7 +90,7 @@ export default function App() {
             <Header route={route} />
             <div className="mx-auto max-w-[1360px] px-4 pb-16 pt-6 sm:px-6 lg:px-8">
               {route === 'studio' && <LaunchStudio />}
-              {route === 'content' && <LocalisedContentView />}
+              {route === 'content' && <TrustMapView initialView="doc" />}
               {route === 'trustmap' && <TrustMapView />}
               {route === 'sources' && <SourcesView />}
               {route === 'history' && <HistoryView />}

@@ -1,21 +1,20 @@
-import { Compass, Languages, ScanSearch, Library, History, ArrowRight } from 'lucide-react';
+import { Compass, ScanSearch, Library, History, ArrowRight } from 'lucide-react';
 import type { Route } from '../App';
 import { useStore, isStale } from '../state/store';
 import { segmentStatus } from '../../../trust/rules';
 import { SAMPLE_COMPANY } from '../../../data/sample';
 import { cx } from './ui';
 
-const NAV: Array<{ route: Route; label: string; Icon: typeof Compass }> = [
-  { route: 'studio', label: 'Launch Studio', Icon: Compass },
-  { route: 'content', label: 'Localised Content', Icon: Languages },
-  { route: 'trustmap', label: 'TrustMap', Icon: ScanSearch },
-  { route: 'sources', label: 'Regulatory Sources', Icon: Library },
-  { route: 'history', label: 'Review History', Icon: History },
+const NAV: Array<{ route: Route; label: string; Icon: typeof Compass; also?: Route[] }> = [
+  { route: 'studio', label: 'Your product', Icon: Compass },
+  { route: 'trustmap', label: 'Review', Icon: ScanSearch, also: ['content'] },
+  { route: 'sources', label: 'Sources', Icon: Library },
+  { route: 'history', label: 'History', Icon: History },
 ];
 
 const GROUPS: Array<[string, typeof NAV]> = [
-  ['Launch', NAV.slice(0, 3)],
-  ['Reference', NAV.slice(3)],
+  ['Launch', NAV.slice(0, 2)],
+  ['Reference', NAV.slice(2)],
 ];
 
 export function Logo() {
@@ -54,8 +53,8 @@ export function Sidebar({ route }: { route: Route }) {
         <div key={group} className="mt-6">
           <div className="px-3 text-[11.5px] font-medium text-muted">{group}</div>
           <ul className="mt-1.5 space-y-0.5">
-            {items.map(({ route: r, label, Icon }) => {
-              const active = r === route;
+            {items.map(({ route: r, label, Icon, also }) => {
+              const active = r === route || !!also?.includes(route);
               return (
                 <li key={r}>
                   <a
