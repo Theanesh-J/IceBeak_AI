@@ -51,28 +51,28 @@ export function SectionTitle({ title, hint, action }: { title: string; hint?: Re
 
 export const STATUS_META: Record<EvidenceStatus | 'none', { label: string; short: string; tone: string; dot: string; Icon: typeof CircleCheck }> = {
   supported: {
-    label: 'Supported by provided evidence',
+    label: 'Backed by your evidence',
     short: 'Supported',
     tone: 'bg-ok-soft text-ok border-ok-line',
     dot: 'bg-ok',
     Icon: CircleCheck,
   },
   review: {
-    label: 'Missing evidence / requires review',
+    label: 'A person needs to check this',
     short: 'Needs review',
     tone: 'bg-warn-soft text-warn border-warn-line',
     dot: 'bg-[#d08a14]',
     Icon: CircleAlert,
   },
   blocked: {
-    label: 'Blocked: critical problem identified',
+    label: 'Must be fixed before publishing',
     short: 'Blocked',
     tone: 'bg-bad-soft text-bad border-bad-line',
     dot: 'bg-bad',
     Icon: OctagonX,
   },
   none: {
-    label: 'No claim detected',
+    label: 'Nothing to check',
     short: 'No claim',
     tone: 'bg-canvas text-muted border-line',
     dot: 'bg-line-2',

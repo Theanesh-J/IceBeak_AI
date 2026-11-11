@@ -51,19 +51,19 @@ Open http://localhost:5173. This starts the web app (Vite, port 5173) and the AP
 
 ## 90-second judge demo
 
-Start from a clean state. If you have run the app before, click **Clear** in Launch Studio.
+Start from a clean state. If you have run the app before, click **Start over** in Launch Studio.
 
 | Time | Action | What to point out |
 |---|---|---|
-| 0:00 | **Launch Studio** is open. Note the header: Northfield Skincare, UK → Germany, and the workflow *Product → Localise → Verify → Review*. | The top-right badge says **Sample scenario · no live model**. We never pretend inference is happening. |
-| 0:10 | Click **Load example product**. Scroll briefly through the claims and the evidence list. | The business has hydration, perception and formula data, plus a *UK* safety report. It has **no clinical study**. |
-| 0:20 | Click **Generate German content**. | "Latest check": 2 blocked, 8 need review, 9 supported. The rule engine ran immediately, and no model judged its own output. |
-| 0:30 | Click **Review in TrustMap**. | Every statement is highlighted by evidence status. Toggle *German output / English source*. |
-| 0:40 | Click the red statement **"Klinisch erwiesen: beseitigt Falten in sieben Tagen"**. | The inspector shows the original English, the German, the detected wording, the **missing clinical study**, and verbatim excerpts from **Reg. (EU) 655/2013 Annex, criteria 3(1) and 4(1)**, linked to EUR-Lex. The explanation is labelled as ProofLingo text, separate from the legal excerpt. |
-| 0:55 | Scroll to **Reviewer decision**. The proposed revision removes the clinical, wrinkle and seven-day promises. The checkbox also revises the linked marketing line. Click **Approve revision**. | The sidebar badge switches to **recheck**. Statuses are marked as out of date, not silently updated. |
-| 1:05 | Click **Re-run checks**. | **6 issues resolved, 0 blocked.** The revised statement is now *supported* by the consumer perception test. The note says *resolved ≠ legal approval*. |
-| 1:15 | Click **Product information**. | The EU Responsible Person, the EU safety report and the CPNP notification are **still pending**, and German label-language rules show **Unable to verify** (no curated source). The fixed claim did not make unrelated gaps disappear. |
-| 1:25 | **Review History**. | Before/after text for each revision, linked findings, and the *unchecked baseline vs verified pipeline* table. Use **Markdown report** to export. |
+| 0:00 | **Launch Studio** shows the start screen. | One sentence says what the tool does. The badge next to the title says **Sample mode**, so we never pretend a model is running. |
+| 0:10 | Click **Use the example product**. | The product summary lists the claims and the evidence. The business has hydration, perception and formula data, plus a *UK* safety report, but **no clinical study**. |
+| 0:20 | Click **Generate German content**. | The result card says **"2 statements must be fixed before you publish."** The rules ran immediately; no model judged its own output. |
+| 0:30 | Click **Review and fix**. | The TrustMap verdict repeats the headline. Every sentence is coloured red, amber or green. Toggle *German / English*. |
+| 0:40 | Click **Fix the first one**. | The inspector shows the German sentence with the problem words highlighted, **why it's flagged** (no clinical study), and **what's missing**. Open **Evidence and law** to show the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
+| 0:55 | Under **Suggested fix**, keep "Also fix the same claim in Marketing" ticked and click **Approve fix**. | The verdict changes to **"You changed the text."** Results are marked out of date, not silently updated. |
+| 1:05 | Click **Re-run checks**. | **"Nothing is blocked." "Last change fixed 6 problems."** The new sentence is green, backed by the consumer perception test. Fixed is not legal approval. |
+| 1:15 | Click the **Product information** tab. | The EU Responsible Person, EU safety report and CPNP notification are **still amber**, and German label rules say **Can't verify**. Fixing the claim didn't make unrelated gaps disappear. |
+| 1:25 | **Review History**. | Before/after text for each fix, and the *unchecked vs TrustMap* table. Use **Markdown report** to export. |
 
 ---
 

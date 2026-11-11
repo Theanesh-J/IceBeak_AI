@@ -199,9 +199,7 @@ export function validate(product: ProductInput, content: LocalisedContent): { fi
         sourceRefs: [R655('c3-1'), R655('c3-3'), R655('c4-1')],
         explanation: studies.length
           ? 'A clinical study was provided, but the engine cannot judge whether its design, population and endpoints support this exact wording.'
-          : `The statement presents the result as clinically proven, but the business provided no clinical study. The evidence on file (${
-              product.evidence.map((e) => e.title).join(', ') || 'none'
-            }) does not measure this outcome.`,
+          : 'It says “clinically proven”, but you have no clinical study. None of your evidence measures this result.',
         suggestedAction: studies.length
           ? 'Ask a claims specialist to confirm the study supports the wording.'
           : 'Remove the clinical claim, or attach a clinical study and rerun the checks.',
@@ -221,7 +219,7 @@ export function validate(product: ProductInput, content: LocalisedContent): { fi
         evidenceUsed: [],
         missing: ['Evidence that the product fully achieves the stated outcome'],
         sourceRefs: [R655('c4-1'), R1223('art20-1')],
-        explanation: `“${abs.any}” promises a complete, absolute result. None of the evidence provided measures such an outcome, so the wording goes beyond the supporting evidence on file.`,
+        explanation: `“${abs.any}” promises a total result. None of your evidence shows that, so the claim goes further than your proof.`,
         suggestedAction: 'Replace the absolute promise with a benefit the provided evidence actually measures.',
       });
     }
