@@ -176,12 +176,8 @@ export function getProvision(sourceId: string, provisionId: string) {
 
 /** Topics the engine recognises but for which no curated source is loaded. */
 export const KNOWN_SOURCE_GAPS = {
-  freeFrom:
-    'No curated source for “free from” claims is loaded. EU guidance on this topic exists outside the two regulations in this library and has not been added or checked.',
-  natural:
-    'No curated source for “natural” or “naturally derived” claims is loaded. Any applicable standard has not been added or checked.',
-  sensitive:
-    'No curated source defining substantiation for “sensitive skin” suitability claims is loaded.',
-  germanLaw:
-    'German national rules (e.g. on label language under Article 19(5)) are not in this library. A German regulatory specialist must confirm them.',
+  freeFrom: '“Free from” claims. EU guidance exists, but it isn’t loaded or checked here yet.',
+  natural: '“Natural” or “naturally derived” claims. No standard is loaded yet.',
+  sensitive: '“Sensitive skin” claims. No loaded source says what evidence they need.',
+  germanLaw: 'German label-language rules (set nationally under Article 19(5)). A German specialist must confirm them.',
 };

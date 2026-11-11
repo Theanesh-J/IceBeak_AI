@@ -71,7 +71,7 @@ export default function App() {
               <Sidebar route={route} />
               <button
                 onClick={() => setMenuOpen(false)}
-                className="absolute right-3 top-4 rounded p-1 text-white/70 hover:text-white"
+                className="absolute right-3 top-4 rounded-full p-1.5 text-muted hover:bg-fill hover:text-ink"
                 aria-label="Close navigation"
               >
                 <X size={18} />

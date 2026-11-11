@@ -85,7 +85,7 @@ export function TrustMapView() {
         <Summary segs={segs} onNext={queue[0] ? () => select(queue[0].id) : undefined} />
 
         <div className="flex items-center justify-between gap-3">
-          <div className="inline-flex rounded-xl bg-[#eef0ec] p-1" role="tablist" aria-label="View">
+          <div className="inline-flex rounded-xl bg-fill p-1" role="tablist" aria-label="View">
             {(
               [
                 ['list', 'To-do list', ListChecks],
@@ -122,7 +122,7 @@ export function TrustMapView() {
           <div className="fixed inset-0 z-30 bg-navy/40 fade-in lg:hidden" onClick={() => select(undefined)} aria-hidden />
           <aside
             aria-label="Sentence details"
-            className="fixed inset-x-0 bottom-0 z-40 max-h-[88vh] overflow-y-auto rounded-t-3xl bg-surface shadow-2xl sheet-in lg:sticky lg:inset-auto lg:top-6 lg:z-auto lg:max-h-[calc(100vh-3rem)] lg:self-start lg:rounded-2xl lg:border lg:border-line/80 lg:shadow-[0_1px_2px_rgba(23,33,43,0.04)]"
+            className="fixed inset-x-0 bottom-0 z-40 max-h-[88vh] overflow-y-auto rounded-t-3xl bg-surface shadow-2xl sheet-in lg:sticky lg:inset-auto lg:top-6 lg:z-auto lg:max-h-[calc(100vh-3rem)] lg:self-start lg:rounded-2xl lg:border lg:border-line"
           >
             <Detail key={selected.id + state.contentVersion} seg={selected} queue={queue} onSelect={select} />
           </aside>
@@ -180,7 +180,7 @@ function Summary({ segs, onNext }: { segs: Seg[]; onNext?: () => void }) {
         <div>
           {counts.blocked > 0 ? (
             <h2 className="flex items-baseline gap-3 text-ink">
-              <span className="text-[52px] font-semibold leading-none tracking-tight tabular-nums text-bad">{counts.blocked}</span>
+              <span className="text-[52px] font-semibold leading-none tracking-tight tabular-nums text-ink">{counts.blocked}</span>
               <span className="text-[22px] font-semibold tracking-tight">{counts.blocked === 1 ? 'sentence to fix' : 'sentences to fix'}</span>
             </h2>
           ) : (
@@ -254,7 +254,7 @@ function TodoList({ segs, selectedId, onSelect }: { segs: Seg[]; selectedId?: st
               )}
             </div>
             {!collapsed && (
-              <ul className="overflow-hidden rounded-2xl border border-line/80 bg-surface shadow-[0_1px_2px_rgba(23,33,43,0.04)]">
+              <ul className="overflow-hidden rounded-2xl border border-line bg-surface">
                 {items.map((s, i) => (
                   <li key={s.id} className={cx(i > 0 && 'border-t border-line')}>
                     <button
@@ -349,7 +349,7 @@ function mark(text: string, triggers: string[]): ReactNode {
   const re = new RegExp(`(${t.map((x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')})`, 'gi');
   return text.split(re).map((p, i) =>
     i % 2 ? (
-      <mark key={i} className="rounded bg-[#ffe08a] px-0.5 text-ink">
+      <mark key={i} className="rounded bg-mark px-0.5 text-ink">
         {p}
       </mark>
     ) : (
@@ -480,7 +480,7 @@ function Detail({ seg, queue, onSelect }: { seg: Seg; queue: Seg[]; onSelect: (i
             <ul className="mt-2 space-y-2">
               {missing.map((x) => (
                 <li key={x} className="flex gap-3 text-[14.5px] text-ink">
-                  <span className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-[#d08a14]" aria-hidden /> {x}
+                  <span className="mt-[7px] h-2 w-2 shrink-0 rounded-full bg-warn-dot" aria-hidden /> {x}
                 </li>
               ))}
             </ul>

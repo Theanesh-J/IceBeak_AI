@@ -65,7 +65,7 @@ Start from a clean state. If you have run the app before, click **Start over** i
 | 0:35 | Click **Fix next**. | The detail panel shows the German sentence with the problem words highlighted, **What's wrong** ("It says clinically proven, but you have no clinical study") and **What's missing**. Open **What the law says** for the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
 | 0:55 | Keep "Also fix the same claim in Marketing" ticked and tap **Use this fix**. | The checks re-run automatically: **"Fixed and checked again"**, the headline flips to **"Nothing to fix"**, and "Checked again: 6 problems fixed". Fixed means the check passes; it isn't legal approval. |
 | 1:10 | Tap **Next item**, then **Send to an expert**. | Items the evidence can't settle (sensitive skin, EU Responsible Person, safety report, CPNP, German label rules) **stay amber** and go to a human. Fixing one claim didn't hide the other gaps. |
-| 1:20 | Switch to **Full document**, then open **Review History**. | The document view shows the highlighted German text. History shows before/after for each fix and the *unchecked vs TrustMap* table. Use **Markdown report** to export. |
+| 1:20 | Switch to **Full document**, then open **Review History**. | The document view shows the highlighted German text. History lists every action like a bank statement (tap a fix to see the old text crossed out and the new text) and a *What ProofLingo changed* comparison. Click **Download report** to export. |
 
 ---
 
@@ -95,7 +95,7 @@ How it works (`server/index.ts`):
 - Deterministic TrustMap engine (`/trust/rules.ts`) with 20 rules. They cover clinical and absolute claims, time-bound results, hydration duration vs measured timepoints, sensory claims vs perception data, ingredient presence and concentration vs INCI and spec, free-from contradictions, medicinal wording, endorsements, suitability, "natural", uniqueness, volume vs declared size, numbers preserved EN↔DE, German text adding claims, untranslated text, brand preservation, and EU market-entry prerequisites.
 - A review screen built like a banking app: summary card ("2 sentences to fix") with a progress bar, a to-do list grouped by urgency, and a detail panel (a bottom sheet on phones) that goes what's wrong → what's missing → suggested fix. Actions: use this fix, edit myself, send to an expert, remove. Every change is re-checked automatically, and the screen shows what it fixed.
 - A curated source library with **verbatim excerpts checked against EUR-Lex** (Official Journal versions of Reg. (EU) 655/2013 and Reg. (EC) 1223/2009). Topics without a curated source report **Can't verify** and go to a specialist.
-- Change history, Markdown and JSON report export, and an unchecked-vs-verified comparison computed from the session.
+- Activity feed with before/after text for each fix, Markdown and JSON report download, and a "What ProofLingo changed" comparison computed from the session.
 - Server-side structured LLM generation and revision drafts (needs a key).
 - Local persistence of non-sensitive demo state (`localStorage`).
 

@@ -99,7 +99,7 @@ function runValidation(state: AppState): AppState {
     id: uid(),
     at: run.ranAt,
     type: 'validation',
-    summary: `Checks run: ${rulesRun.length} rules over ${run.segmentCount} statements. ${count('blocked')} blocked, ${count('review')} need review, ${count('supported')} supported.`,
+    summary: `${state.validation ? 'Checked again' : `Checked ${run.segmentCount} sentences`} · ${count('blocked')} to fix, ${count('review')} for an expert, ${count('supported')} backed by evidence`,
     resolved: resolved.map((f) => f.id),
     stillOpen: nextOpen.length,
   };
@@ -118,7 +118,7 @@ function reducer(state: AppState, action: Action): AppState {
         ...initialState,
         mode: state.mode,
         product: structuredClone(SAMPLE_PRODUCT),
-        history: [{ id: uid(), at: now(), type: 'product-loaded', summary: 'Loaded example product: Northfield Oat & Ceramide Daily Moisturiser' }],
+        history: [{ id: uid(), at: now(), type: 'product-loaded', summary: 'Example product loaded · Northfield Oat & Ceramide Daily Moisturiser' }],
       };
     case 'reset':
       return { ...initialState, mode: state.mode };
@@ -144,8 +144,8 @@ function reducer(state: AppState, action: Action): AppState {
             type: 'generated',
             summary:
               action.content.mode === 'ai'
-                ? `Generated ${action.content.segments.length} German statements with ${action.content.model} (connected AI mode)`
-                : `Composed ${action.content.segments.length} German statements from the sample scenario library (no model inference)`,
+                ? `German content created · ${action.content.segments.length} sentences written by ${action.content.model}`
+                : `German content created · ${action.content.segments.length} sentences from prewritten sample text, no model`,
           },
           ...state.history,
         ],
@@ -180,7 +180,7 @@ function reducer(state: AppState, action: Action): AppState {
           id: uid(),
           at: now(),
           type: action.decision === 'revision-applied' ? 'revision' : 'manual-edit',
-          summary: `${action.decision === 'revision-applied' ? 'Revision approved' : 'Manual edit'} · ${before.field}`,
+          summary: `${action.decision === 'revision-applied' ? 'Fix applied' : 'Edited by you'} · ${before.field}`,
           segmentId: e.segmentId,
           before: { en: before.en, de: before.de },
           after: { en: e.en, de: e.de },
@@ -216,7 +216,7 @@ function reducer(state: AppState, action: Action): AppState {
             id: uid(),
             at: now(),
             type: 'revision',
-            summary: `Statement removed · ${seg.field}`,
+            summary: `Sentence removed · ${seg.field}`,
             segmentId: seg.id,
             before: { en: seg.en, de: seg.de },
             after: { en: '', de: '' },
@@ -239,7 +239,7 @@ function reducer(state: AppState, action: Action): AppState {
             id: uid(),
             at: now(),
             type: 'decision',
-            summary: `${action.decision === 'escalated' ? 'Escalated to expert' : 'Acknowledged for review'} · ${seg?.field ?? action.segmentId}`,
+            summary: `${action.decision === 'escalated' ? 'Sent to an expert' : 'Kept for review'} · ${seg?.field ?? action.segmentId}`,
             segmentId: action.segmentId,
             findingIds: action.findingIds,
             decision: action.decision,
