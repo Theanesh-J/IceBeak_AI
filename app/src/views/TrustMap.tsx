@@ -101,7 +101,7 @@ export function TrustMapView({ initialView = 'list' }: { initialView?: View }) {
   const next = queue[0] ? () => openSentence(queue[0].id) : nextStep ? () => openStep(nextStep.key) : undefined;
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(400px,460px)]">
+    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_minmax(400px,460px)]">
       <div className="min-w-0 space-y-6">
         <Summary segs={segs} steps={steps} onNext={next} nextIsFix={queue.some((s) => s.status === 'blocked')} />
 
@@ -154,10 +154,10 @@ export function TrustMapView({ initialView = 'list' }: { initialView?: View }) {
 
       {selected || step ? (
         <>
-          <div className="fixed inset-0 z-30 bg-navy/40 fade-in lg:hidden" onClick={close} aria-hidden />
+          <div className="fixed inset-0 z-30 bg-navy/40 fade-in xl:hidden" onClick={close} aria-hidden />
           <aside
             aria-label="Details"
-            className="fixed inset-x-0 bottom-0 z-40 max-h-[88vh] overflow-y-auto rounded-t-3xl bg-surface shadow-2xl sheet-in lg:sticky lg:inset-auto lg:top-6 lg:z-auto lg:max-h-[calc(100vh-3rem)] lg:self-start lg:rounded-2xl lg:border lg:border-line lg:shadow-none"
+            className="fixed inset-x-0 bottom-0 z-40 mx-auto max-h-[88vh] max-w-2xl overflow-y-auto rounded-t-3xl bg-surface shadow-2xl sheet-in xl:sticky xl:inset-auto xl:top-6 xl:z-auto xl:mx-0 xl:max-h-[calc(100vh-3rem)] xl:max-w-none xl:self-start xl:rounded-2xl xl:border xl:border-line xl:shadow-none"
           >
             {selected ? (
               <SentenceDetail key={selected.id + state.contentVersion} seg={selected} queue={queue} onSelect={openSentence} onClose={close} />
@@ -167,7 +167,7 @@ export function TrustMapView({ initialView = 'list' }: { initialView?: View }) {
           </aside>
         </>
       ) : (
-        <div className="hidden lg:block">
+        <div className="hidden xl:block">
           <Card className="sticky top-6 p-6">
             <h2 className="text-[17px] font-semibold">Pick an item to see the details</h2>
             <p className="mt-1.5 text-[14px] leading-relaxed text-muted">You’ll see what’s wrong, what’s missing, and a fix you can apply in one tap.</p>
@@ -421,7 +421,7 @@ function mark(text: string, triggers: string[]): ReactNode {
 function DetailHeader({ icon, title, sub, onClose }: { icon: ReactNode; title: string; sub: string; onClose: () => void }) {
   return (
     <>
-      <div className="flex justify-center pt-3 lg:hidden" aria-hidden>
+      <div className="flex justify-center pt-3 xl:hidden" aria-hidden>
         <span className="h-1.5 w-10 rounded-full bg-line-2" />
       </div>
       <div className="flex items-start justify-between gap-3 px-6 pt-5">
