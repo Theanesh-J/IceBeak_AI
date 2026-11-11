@@ -53,6 +53,17 @@ Open http://localhost:5173. This starts the web app (Vite, port 5173) and the AP
 
 ---
 
+## Share online (Netlify)
+
+Live demo: **https://prooflingo-ieee.netlify.app** (sample mode; Live AI only runs locally, because the API key must stay on a server).
+
+To redeploy after changes, run from `app/` (uses the Netlify CLI login on your machine):
+
+```bash
+npm run build:share
+npx netlify-cli deploy --prod --dir dist-share --site 9f713451-8d3b-4f8e-ab47-b9753354bb7e
+```
+
 ## 90-second judge demo
 
 Start from a clean state. If you have run the app before, click **Start over** on **Your product**.

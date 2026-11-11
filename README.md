@@ -96,6 +96,8 @@ Every module reads and writes this shape. Don't change it without telling the te
 Each folder has a README describing what's in it. Today: `/localise/compose.ts`, `/regulatory/sources.ts`, `/trust/rules.ts`, `/data` (shared types and sample data) and `/eval` (tests). They're all TypeScript and wired into the working app in `/app`.
 
 ## Run it
+Live demo: https://prooflingo-ieee.netlify.app
+
 The working demo lives in `/app` (Module 4). It needs Node 22+ and runs without any API key.
 
 ```bash
