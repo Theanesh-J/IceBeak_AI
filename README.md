@@ -34,7 +34,7 @@ Input (listing, marketing, doc)
 | 2 | Theanesh + Hassan | Localisation | Module 1: translation and cultural adaptation prompts, NLLB comparison, glossary | ⬜ |
 | 3 | Adil | Regulatory RAG | Module 2: curated law excerpts, retriever, flags with exact citations | ⬜ |
 | 4 | Harun | Trust and evaluation | Module 3: trust signals, scoring, eval numbers (FLORES-200 or own test set) | ⬜ |
-| 5 | Yariel | Frontend and integration | Module 4: UI, wiring modules together, deployment and backup demo video | ⬜ |
+| 5 | Yariel | Frontend and integration | Module 4: UI, wiring modules together, deployment and backup demo video | 🟩 |
 
 Status key: ⬜ not started · 🟨 in progress · 🟩 working with mock data · ✅ integrated
 
@@ -93,7 +93,23 @@ Every module reads and writes this shape. Don't change it without telling the te
 /eval         # test sets and results
 ```
 
+Each folder has a README describing what's in it. Today: `/localise/compose.ts`, `/regulatory/sources.ts`, `/trust/rules.ts`, `/data` (shared types and sample data) and `/eval` (tests). They're all TypeScript and wired into the working app in `/app`.
+
 ## Run it
+Live demo: https://prooflingo-ieee.netlify.app
+
+<img src="docs/prooflingo-qr.png" alt="QR code linking to https://prooflingo-ieee.netlify.app" width="160" />
+
+The working demo lives in `/app` (Module 4). It needs Node 22+ and runs without any API key.
+
+```bash
+cd app
+npm install
+npm run dev
 ```
-[setup and run instructions: Person 5 to fill in by hour 6]
-```
+
+Open http://localhost:5173 and click **Use the example product → Generate German content → Review and fix**.
+
+- **Live AI (optional):** copy `app/.env.example` to `app/.env`, add your own `ANTHROPIC_API_KEY`, then restart. `.env` is git-ignored, so never commit keys.
+- **Checks:** `npm test` · `npm run typecheck` · `npm run build`
+- **More:** setup details, the 90-second demo script, and how each module plugs in are in [`app/README.md`](app/README.md).
