@@ -1,0 +1,38 @@
+{
+  "name": "prooflingo",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "node node_modules/concurrently/dist/bin/index.js -k -n api,web -c cyan,blue \"npm:dev:api\" \"npm:dev:web\"",
+    "dev:web": "node node_modules/vite/bin/vite.js",
+    "dev:api": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs watch server/index.ts",
+    "build": "node node_modules/typescript/bin/tsc -b && node node_modules/vite/bin/vite.js build",
+    "typecheck": "node node_modules/typescript/bin/tsc -b && node node_modules/typescript/bin/tsc -p tsconfig.server.json",
+    "test": "node node_modules/tsx/dist/cli.mjs --test tests/*.test.ts",
+    "lint": "node node_modules/oxlint/bin/oxlint src server",
+    "start": "npm run build && node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs server/index.ts"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.8.0",
+    "express": "^5.3.0",
+    "lucide-react": "^1.72.0",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^4.6.7"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "@types/express": "^5.0.6",
+    "@types/node": "^24.19.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "concurrently": "^10.0.7",
+    "oxlint": "^1.90.0",
+    "tailwindcss": "^4.3.5",
+    "tsx": "^4.23.15",
+    "typescript": "~7.0.2",
+    "vite": "^8.3.6"
+  }
+}

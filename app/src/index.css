@@ -1,0 +1,96 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --color-canvas: #f7f8f6;
+  --color-surface: #ffffff;
+  --color-ink: #17212b;
+  --color-ink-2: #3d4a57;
+  --color-muted: #66727e;
+  --color-line: #e3e6e1;
+  --color-line-2: #d3d8d1;
+  --color-navy: #142331;
+  --color-navy-2: #1c3043;
+  --color-teal: #087f70;
+  --color-teal-ink: #066a5e;
+  --color-teal-soft: #e5f2ef;
+
+  --color-ok: #2c6e49;
+  --color-ok-soft: #e6f1ea;
+  --color-ok-line: #a9cfb7;
+  --color-warn: #8a5300;
+  --color-warn-soft: #fdf1dc;
+  --color-warn-line: #f0c77a;
+  --color-bad: #b42318;
+  --color-bad-soft: #fde8e6;
+  --color-bad-line: #f2a59d;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  font-feature-settings: 'cv11', 'ss01';
+  -webkit-font-smoothing: antialiased;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* TrustMap statement highlights */
+.hl {
+  border-radius: 3px;
+  padding: 1px 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  cursor: pointer;
+  transition: background-color 120ms ease, box-shadow 120ms ease;
+}
+.hl-supported {
+  background: var(--color-ok-soft);
+  box-shadow: inset 0 -2px 0 var(--color-ok-line);
+}
+.hl-review {
+  background: var(--color-warn-soft);
+  box-shadow: inset 0 -2px 0 var(--color-warn-line);
+}
+.hl-blocked {
+  background: var(--color-bad-soft);
+  box-shadow: inset 0 -2px 0 var(--color-bad);
+}
+.hl-none {
+  cursor: pointer;
+}
+.hl:hover,
+.hl-none:hover {
+  background: #eef0ec;
+}
+.hl-supported:hover { background: #d8eadf; }
+.hl-review:hover { background: #fbe6c0; }
+.hl-blocked:hover { background: #fbd5d1; }
+.hl-selected {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 1px;
+}
+
+.fade-in {
+  animation: fade-in 160ms ease-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(2px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
