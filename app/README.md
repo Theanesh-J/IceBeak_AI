@@ -55,17 +55,17 @@ Open http://localhost:5173. This starts the web app (Vite, port 5173) and the AP
 
 ## 90-second judge demo
 
-Start from a clean state. If you have run the app before, click **Start over** in Launch Studio.
+Start from a clean state. If you have run the app before, click **Start over** on **Your product**.
 
 | Time | Action | What to point out |
 |---|---|---|
-| 0:00 | **Launch Studio** shows the start screen. | One sentence says what the tool does. The badge next to the title says **Sample mode**, so we never pretend a model is running. |
+| 0:00 | **Your product** shows the start screen. | One sentence says what the tool does. The badge next to the title says **Sample mode**, so we never pretend a model is running. |
 | 0:10 | Click **Use the example product**. | The product summary lists the claims and the evidence. The business has hydration, perception and formula data, plus a *UK* safety report, but **no clinical study**. |
-| 0:20 | Click **Generate German content**, then **Review and fix**. | TrustMap opens like a banking app: a big **"2 sentences to fix"**, a progress bar across all 21 sentences, and a to-do list grouped into *Must fix*, *Needs an expert* and *Backed by evidence*. The rules ran instantly; no model judged its own output. |
-| 0:35 | Click **Fix next**. | The detail panel shows the German sentence with the problem words highlighted, **What's wrong** ("It says clinically proven, but you have no clinical study") and **What's missing**. Open **What the law says** for the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
-| 0:55 | Keep "Also fix the same claim in Marketing" ticked and tap **Use this fix**. | The checks re-run automatically: **"Fixed and checked again"**, the headline flips to **"Nothing to fix"**, and "Checked again: 6 problems fixed". Fixed means the check passes; it isn't legal approval. |
-| 1:10 | Tap **Next item**, then **Send to an expert**. | Items the evidence can't settle (sensitive skin, EU Responsible Person, safety report, CPNP, German label rules) **stay amber** and go to a human. Fixing one claim didn't hide the other gaps. |
-| 1:20 | Switch to **Full document**, then open **Review History**. | The document view shows the highlighted German text. History lists every action like a bank statement (tap a fix to see the old text crossed out and the new text) and a *What ProofLingo changed* comparison. Click **Download report** to export. |
+| 0:20 | Click **Generate German content**, then **Review and fix**. | **Review** opens like a banking app: a big **"2 sentences to fix"**, then "3 need an expert · 4 launch steps to sort", and a progress bar. The rules ran instantly; no model judged its own output. |
+| 0:30 | Click **Fix next**. | The detail panel shows the German sentence with the problem words highlighted, **What's wrong** ("It says clinically proven, but you have no clinical study") and **What's missing**. Open **What the law says** for the exact EUR-Lex quotes from Reg. (EU) 655/2013. |
+| 0:50 | Keep "Also fix the same claim in Marketing" ticked and tap **Use this fix**. | The checks re-run automatically: **"Fixed and checked again"**, the headline flips to **"Nothing to fix"**, and "Checked again: 6 problems fixed". Fixed means the check passes; it isn't legal approval. |
+| 1:05 | Scroll to **Before you can sell in Germany** and open **Appoint an EU Responsible Person**. Tap **Send to an expert**. | Business prerequisites are kept apart from wording: Responsible Person, EU safety assessment, CPNP registration and German label rules. Fixing a claim didn't make them disappear. |
+| 1:20 | Switch to **Side by side** (or **Shop preview**), then open **History**. | English and German next to each other with each sentence's label. History lists every action like a bank statement and shows *What ProofLingo changed*. Click **Download report** to export. |
 
 ---
 
@@ -75,7 +75,7 @@ The API key lives **only on the server**. The browser talks to `/api/*` and neve
 
 1. Copy `.env.example` to `.env` (`.env` is git-ignored).
 2. Set `ANTHROPIC_API_KEY=...` in `.env`. Optionally set `PROOFLINGO_MODEL`; the default is `claude-opus-5-5`.
-3. Restart `npm run dev`. The server log prints `AI mode connected (...)` and the **Live AI** option becomes available in Launch Studio. In TrustMap you also get **Suggest a fix with AI**.
+3. Restart `npm run dev`. The server log prints `AI mode connected (...)` and the **Live AI** option becomes available on **Your product**. In **Review** you also get **Fix with AI**.
 
 How it works (`server/index.ts`):
 
@@ -119,7 +119,7 @@ IceBeak_AI/
     src/state/         Reducer: generate → validate → revise → revalidate; history; localStorage
     src/lib/           API client, report export
     src/components/    Sidebar, header and progress, UI primitives
-    src/views/         LaunchStudio, LocalisedContent, TrustMap, Sources, History
+    src/views/         LaunchStudio (Your product), TrustMap (Review, incl. side by side + shop preview), Sources, History
     server/index.ts    Express API: status, structured generation, fix drafts (holds the API key)
   localise/compose.ts  Sample-mode generation + deterministic regulatory fact lines
   regulatory/sources.ts  Curated regulatory excerpts (verbatim, with URLs). No generated text.
@@ -142,4 +142,4 @@ start screen ──use example / enter own──▶ product ready ──generate
                                                                           │ next item / send to an expert
 ```
 
-The workflow stepper is derived from state. **Review** completes only when nothing is blocked and every amber item has a reviewer decision, such as "Send to specialist".
+Review splits findings in two: **wording** (sentences the business can rewrite) and **launch steps** (Responsible Person, safety assessment, CPNP, German label rules). The split comes from the rule categories in `/trust/rules.ts` (`splitCounts`, `launchSteps`), not from the UI.
