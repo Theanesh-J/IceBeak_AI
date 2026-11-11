@@ -57,6 +57,8 @@ Open http://localhost:5173. This starts the web app (Vite, port 5173) and the AP
 
 Live demo: **https://prooflingo-ieee.netlify.app** (sample mode; Live AI only runs locally, because the API key must stay on a server).
 
+QR code for slides: [`docs/prooflingo-qr.png`](../docs/prooflingo-qr.png) (or the `.svg` for sharp printing).
+
 To redeploy after changes, run from `app/` (uses the Netlify CLI login on your machine):
 
 ```bash

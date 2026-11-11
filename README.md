@@ -98,6 +98,8 @@ Each folder has a README describing what's in it. Today: `/localise/compose.ts`,
 ## Run it
 Live demo: https://prooflingo-ieee.netlify.app
 
+<img src="docs/prooflingo-qr.png" alt="QR code linking to https://prooflingo-ieee.netlify.app" width="160" />
+
 The working demo lives in `/app` (Module 4). It needs Node 22+ and runs without any API key.
 
 ```bash
