@@ -15,5 +15,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false
   },
-  "include": ["server", "../trust", "../regulatory", "../localise", "../data", "../eval"]
+  "include": ["server", "netlify", "../trust", "../regulatory", "../localise", "../data", "../eval"]
 }
