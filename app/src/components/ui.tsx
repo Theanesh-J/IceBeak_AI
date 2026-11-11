@@ -1,6 +1,6 @@
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { CircleCheck, CircleAlert, OctagonX, Minus } from 'lucide-react';
-import type { EvidenceStatus } from '../domain/types';
+import type { EvidenceStatus } from '../../../data/types';
 
 export function cx(...c: Array<string | false | null | undefined>) {
   return c.filter(Boolean).join(' ');

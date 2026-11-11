@@ -1,10 +1,10 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { ArrowRight, Check, ChevronDown, ChevronRight, CircleCheck, Cpu, ExternalLink, Loader2, Pencil, RefreshCw, ScanSearch, Send, Trash2, X } from 'lucide-react';
 import { navigate, useServer } from '../App';
-import type { DocType, EvidenceStatus, Finding, Segment } from '../domain/types';
-import { STATUS_RANK, segmentStatus, summarise } from '../domain/rules';
-import { getProvision } from '../domain/sources';
-import { sampleRevisionFor } from '../domain/compose';
+import type { DocType, EvidenceStatus, Finding, Segment } from '../../../data/types';
+import { STATUS_RANK, segmentStatus, summarise } from '../../../trust/rules';
+import { getProvision } from '../../../regulatory/sources';
+import { sampleRevisionFor } from '../../../localise/compose';
 import { reviseWithAI } from '../lib/api';
 import { isStale, useStore } from '../state/store';
 import { Button, Card, EmptyState, STATUS_META, StatusBadge, cx, formatTime, inputCls } from '../components/ui';

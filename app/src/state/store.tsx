@@ -8,9 +8,9 @@ import type {
   ProductInput,
   ReviewerDecision,
   ValidationRun,
-} from '../domain/types';
-import { SAMPLE_PRODUCT } from '../domain/sample';
-import { summarise, validate } from '../domain/rules';
+} from '../../../data/types';
+import { SAMPLE_PRODUCT } from '../../../data/sample';
+import { summarise, validate } from '../../../trust/rules';
 
 export interface Decision {
   decision: ReviewerDecision;

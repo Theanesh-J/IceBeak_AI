@@ -1,7 +1,7 @@
 import { Download, FileJson, History as HistoryIcon, RefreshCw, Sparkles, PencilLine, Send, Package, ScanSearch } from 'lucide-react';
 import { navigate } from '../App';
-import { summarise } from '../domain/rules';
-import type { HistoryEntry } from '../domain/types';
+import { summarise } from '../../../trust/rules';
+import type { HistoryEntry } from '../../../data/types';
 import { buildMarkdownReport, download } from '../lib/report';
 import { isStale, useStore } from '../state/store';
 import { Button, Card, EmptyState, SectionTitle, cx, formatTime } from '../components/ui';

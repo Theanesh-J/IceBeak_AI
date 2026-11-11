@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { ArrowRight, Check, Cpu, FileText, Loader2, Pencil, Plus, RotateCcw, Trash2, TriangleAlert } from 'lucide-react';
 import { navigate, useServer } from '../App';
-import { generateSampleContent } from '../domain/compose';
-import type { EvidenceItem, EvidenceKind, ProductInput } from '../domain/types';
+import { generateSampleContent } from '../../../localise/compose';
+import type { EvidenceItem, EvidenceKind, ProductInput } from '../../../data/types';
 import { generateWithAI } from '../lib/api';
 import { useStore } from '../state/store';
-import { summarise } from '../domain/rules';
+import { summarise } from '../../../trust/rules';
 import { Button, Card, Field, STATUS_META, inputCls, cx } from '../components/ui';
 
 export const EVIDENCE_KINDS: Array<{ value: EvidenceKind; label: string }> = [

@@ -14,14 +14,18 @@ IEEE Hackathon · Track 2: Scaling Globally with AI (sponsored by the 48 Group).
 
 This folder is **Module 4 (UI + integration)**. It runs end to end on its own today, so it doubles as the integration shell for the other modules:
 
-| Team module | Folder | Where it plugs into this app |
+| Team module | Folder | What's there now |
 |---|---|---|
-| 1 · Localise | `/localise` | `server/index.ts` → `POST /api/generate` (currently one structured Claude call; swap in module output here) |
-| 2 · Regulatory RAG | `/regulatory`, `/data` | `src/domain/sources.ts` (curated verbatim excerpts + URLs) and the source refs in `src/domain/rules.ts` |
-| 3 · Trust | `/trust`, `/eval` | `src/domain/rules.ts` (deterministic checks → supported / review / blocked) |
-| 4 · UI + integration | `/app` (this folder) | everything under `src/views` and `src/components` |
+| 1 · Localise | `/localise` | `compose.ts`: sample-mode German content and the regulatory fact lines. Live AI generation is `POST /api/generate` in `app/server/index.ts`. |
+| 2 · Regulatory | `/regulatory` | `sources.ts`: exact EUR-Lex excerpts with URLs, plus the known gaps |
+| 3 · Trust | `/trust` | `rules.ts`: deterministic checks → supported / review / blocked |
+| Shared data | `/data` | `types.ts` (data contract) and `sample.ts` (fictional demo data) |
+| Tests | `/eval` | `rules.test.ts`, `report.test.ts` (run `npm test` from `app/`) |
+| 4 · UI + integration | `/app` (this folder) | React UI in `src/`, API server in `server/` |
 
-**Data contract:** a statement here is a `Segment` (`segment_id` → `id`, `source` → `en`, `localised` → `de`), and each `reg_flags` entry corresponds to a `Finding` with `sourceRefs` holding the exact citation. See `src/domain/types.ts`. One deliberate difference from the draft contract: this app shows **no numeric trust score** (e.g. `0.72`). Statuses are evidence coverage with written reasons, so we don't present a made-up confidence number.
+Each module folder has its own README. The app imports the modules directly, so a teammate can change `/trust/rules.ts` and see the result in the UI straight away.
+
+**Data contract:** a statement here is a `Segment` (`segment_id` → `id`, `source` → `en`, `localised` → `de`), and each `reg_flags` entry corresponds to a `Finding` with `sourceRefs` holding the exact citation. See `/data/types.ts`. One deliberate difference from the draft contract: this app shows **no numeric trust score** (e.g. `0.72`). Statuses are evidence coverage with written reasons, so we don't present a made-up confidence number.
 
 ---
 
@@ -90,7 +94,7 @@ How it works (`server/index.ts`):
 
 **Implemented (real logic running on app state)**
 - Product form, three localised documents, side-by-side comparison and German customer preview.
-- Deterministic TrustMap engine (`src/domain/rules.ts`) with 20 rules. They cover clinical and absolute claims, time-bound results, hydration duration vs measured timepoints, sensory claims vs perception data, ingredient presence and concentration vs INCI and spec, free-from contradictions, medicinal wording, endorsements, suitability, "natural", uniqueness, volume vs declared size, numbers preserved EN↔DE, German text adding claims, untranslated text, brand preservation, and EU market-entry prerequisites.
+- Deterministic TrustMap engine (`/trust/rules.ts`) with 20 rules. They cover clinical and absolute claims, time-bound results, hydration duration vs measured timepoints, sensory claims vs perception data, ingredient presence and concentration vs INCI and spec, free-from contradictions, medicinal wording, endorsements, suitability, "natural", uniqueness, volume vs declared size, numbers preserved EN↔DE, German text adding claims, untranslated text, brand preservation, and EU market-entry prerequisites.
 - Plain-language verdicts ("2 statements must be fixed before you publish"), a step-by-step inspector (why it's flagged → what's missing → suggested fix), reviewer actions (approve fix, edit myself, send to specialist, remove), stale-state detection and re-validation showing what the last change fixed.
 - A curated source library with **verbatim excerpts checked against EUR-Lex** (Official Journal versions of Reg. (EU) 655/2013 and Reg. (EC) 1223/2009). Topics without a curated source report **Can't verify** and go to a specialist.
 - Change history, Markdown and JSON report export, and an unchecked-vs-verified comparison computed from the session.
@@ -98,7 +102,7 @@ How it works (`server/index.ts`):
 - Local persistence of non-sensitive demo state (`localStorage`).
 
 **Simulated / sample data**
-- The company and product are fictional. In sample mode, German text comes from a prewritten library (`src/domain/sample.ts`), and the curated revisions are prewritten. This is labelled throughout the UI. Text without a prewritten translation is flagged as untranslated, not invented.
+- The company and product are fictional. In sample mode, German text comes from a prewritten library (`/data/sample.ts`), and the curated revisions are prewritten. This is labelled throughout the UI. Text without a prewritten translation is flagged as untranslated, not invented.
 - The evidence items are fictional descriptions; no documents are parsed.
 
 **Future work**
@@ -112,19 +116,19 @@ How it works (`server/index.ts`):
 ## Architecture
 
 ```
-src/
-  domain/            Pure TypeScript, shared by browser and server
-    types.ts         Product, Segment, Finding, ValidationRun…
-    sources.ts       Curated regulatory excerpts (verbatim, with URLs). No generated text.
-    sample.ts        SAMPLE MODE data: fictional product, prewritten German, curated fixes
-    compose.ts       Sample generation + deterministic regulatory fact lines
-    rules.ts         TrustMap rule engine (deterministic, no model)
-  state/store.tsx    Reducer: generate → validate → revise → revalidate; history; localStorage
-  lib/               API client, report export
-  components/        Shell, header/workflow, UI primitives
-  views/             LaunchStudio, LocalisedContent, TrustMap, Sources, History
-server/index.ts      Express API: status, structured generation, revision drafts
-tests/               node:test suites (run with npm test)
+IceBeak_AI/
+  app/                 Module 4 · UI + integration (this folder)
+    src/state/         Reducer: generate → validate → revise → revalidate; history; localStorage
+    src/lib/           API client, report export
+    src/components/    Sidebar, header and progress, UI primitives
+    src/views/         LaunchStudio, LocalisedContent, TrustMap, Sources, History
+    server/index.ts    Express API: status, structured generation, fix drafts (holds the API key)
+  localise/compose.ts  Sample-mode generation + deterministic regulatory fact lines
+  regulatory/sources.ts  Curated regulatory excerpts (verbatim, with URLs). No generated text.
+  trust/rules.ts       TrustMap rule engine (deterministic, no model)
+  data/types.ts        Shared data contract: Product, Segment, Finding, ValidationRun…
+  data/sample.ts       SAMPLE MODE data: fictional product, prewritten German, curated fixes
+  eval/                node:test suites (run npm test from app/)
 ```
 
 **Application states**

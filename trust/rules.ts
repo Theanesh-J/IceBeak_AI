@@ -18,8 +18,8 @@ import type {
   ProductInput,
   Segment,
   SourceRef,
-} from './types';
-import { KNOWN_SOURCE_GAPS } from './sources';
+} from '../data/types';
+import { KNOWN_SOURCE_GAPS } from '../regulatory/sources';
 
 const ref = (sourceId: 'eu-655-2013' | 'ec-1223-2009', provisionId: string): SourceRef => ({ sourceId, provisionId });
 const R655 = (p: string) => ref('eu-655-2013', p);

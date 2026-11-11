@@ -1,11 +1,11 @@
 import { useState, type KeyboardEvent } from 'react';
 import { ArrowRight, Languages, ScanSearch, Eye, Columns2 } from 'lucide-react';
 import { navigate } from '../App';
-import type { DocType, Segment } from '../domain/types';
-import { segmentStatus } from '../domain/rules';
+import type { DocType, Segment } from '../../../data/types';
+import { segmentStatus } from '../../../trust/rules';
 import { isStale, useStore } from '../state/store';
 import { Button, Card, EmptyState, StatusBadge, cx } from '../components/ui';
-import { SAMPLE_COMPANY } from '../domain/sample';
+import { SAMPLE_COMPANY } from '../../../data/sample';
 
 export const DOC_TABS: Array<{ key: DocType; label: string }> = [
   { key: 'listing', label: 'Product listing' },

@@ -1,6 +1,6 @@
 import { ExternalLink, ShieldQuestion } from 'lucide-react';
-import { KNOWN_SOURCE_GAPS, SOURCES } from '../domain/sources';
-import { RULES } from '../domain/rules';
+import { KNOWN_SOURCE_GAPS, SOURCES } from '../../../regulatory/sources';
+import { RULES } from '../../../trust/rules';
 import { useStore } from '../state/store';
 import { Card, SectionTitle } from '../components/ui';
 

@@ -15,5 +15,5 @@
     "noUnusedLocals": true,
     "noUnusedParameters": false
   },
-  "include": ["server", "src/domain", "tests"]
+  "include": ["server", "../trust", "../regulatory", "../localise", "../data", "../eval"]
 }

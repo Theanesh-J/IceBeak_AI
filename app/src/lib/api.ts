@@ -1,4 +1,4 @@
-import type { LocalisedContent, ProductInput, Segment, Finding } from '../domain/types';
+import type { LocalisedContent, ProductInput, Segment, Finding } from '../../../data/types';
 
 export interface ServerStatus {
   reachable: boolean;

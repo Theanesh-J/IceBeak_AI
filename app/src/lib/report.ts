@@ -1,7 +1,7 @@
 import type { AppState } from '../state/store';
-import { segmentStatus } from '../domain/rules';
-import { getProvision } from '../domain/sources';
-import { SAMPLE_COMPANY } from '../domain/sample';
+import { segmentStatus } from '../../../trust/rules';
+import { getProvision } from '../../../regulatory/sources';
+import { SAMPLE_COMPANY } from '../../../data/sample';
 
 const STATUS_TEXT = {
   supported: 'Supported by provided evidence',

@@ -9,8 +9,8 @@
     "dev:api": "node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs watch server/index.ts",
     "build": "node node_modules/typescript/bin/tsc -b && node node_modules/vite/bin/vite.js build",
     "typecheck": "node node_modules/typescript/bin/tsc -b && node node_modules/typescript/bin/tsc -p tsconfig.server.json",
-    "test": "node node_modules/tsx/dist/cli.mjs --test tests/*.test.ts",
-    "lint": "node node_modules/oxlint/bin/oxlint src server",
+    "test": "node node_modules/tsx/dist/cli.mjs --test ../eval/*.test.ts",
+    "lint": "node node_modules/oxlint/bin/oxlint src server ../trust ../regulatory ../localise ../data ../eval",
     "start": "npm run build && node --env-file-if-exists=.env node_modules/tsx/dist/cli.mjs server/index.ts"
   },
   "dependencies": {

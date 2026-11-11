@@ -1,8 +1,8 @@
 // Builds localised content. Regulatory fact lines are always composed here,
 // deterministically from product facts and evidence, in both modes.
 
-import type { EvidenceItem, LocalisedContent, ProductInput, Segment } from './types';
-import { CATEGORY_DE, SAMPLE_INFO, SAMPLE_MARKETING, SAMPLE_REVISIONS, SAMPLE_TRANSLATIONS, normalise } from './sample';
+import type { EvidenceItem, LocalisedContent, ProductInput, Segment } from '../data/types';
+import { CATEGORY_DE, SAMPLE_INFO, SAMPLE_MARKETING, SAMPLE_REVISIONS, SAMPLE_TRANSLATIONS, normalise } from '../data/sample';
 
 const UNTRANSLATED = '[Keine deutsche Fassung im Beispielmodus verfügbar]';
 

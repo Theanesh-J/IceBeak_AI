@@ -12,8 +12,8 @@ import { fileURLToPath } from 'node:url';
 import Anthropic from '@anthropic-ai/sdk';
 import { betaZodOutputFormat } from '@anthropic-ai/sdk/helpers/beta/zod';
 import { z } from 'zod';
-import { buildRegulatorySegments, claimSegmentId } from '../src/domain/compose.ts';
-import type { Finding, LocalisedContent, ProductInput, Segment } from '../src/domain/types.ts';
+import { buildRegulatorySegments, claimSegmentId } from '../../localise/compose.ts';
+import type { Finding, LocalisedContent, ProductInput, Segment } from '../../data/types.ts';
 
 const PORT = Number(process.env.API_PORT ?? 8787);
 const MODEL = process.env.PROOFLINGO_MODEL ?? 'claude-opus-5-5';

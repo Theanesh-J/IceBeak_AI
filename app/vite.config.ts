@@ -8,7 +8,8 @@ export default defineConfig({
     port: 5173,
     // Vite's fs allow-list check misreads project paths containing ':' (e.g. this
     // hackathon folder). The dev server only listens on localhost.
-    fs: { strict: !process.cwd().includes(':') },
+    // The team modules (/trust, /regulatory, /localise, /data) live one level up.
+    fs: { strict: !process.cwd().includes(':'), allow: ['..'] },
     proxy: { '/api': 'http://localhost:8787' },
   },
 })

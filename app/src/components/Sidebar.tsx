@@ -1,8 +1,8 @@
 import { Compass, Languages, ScanSearch, Library, History, ArrowRight } from 'lucide-react';
 import type { Route } from '../App';
 import { useStore, isStale } from '../state/store';
-import { segmentStatus } from '../domain/rules';
-import { SAMPLE_COMPANY } from '../domain/sample';
+import { segmentStatus } from '../../../trust/rules';
+import { SAMPLE_COMPANY } from '../../../data/sample';
 import { cx } from './ui';
 
 const NAV: Array<{ route: Route; label: string; Icon: typeof Compass }> = [

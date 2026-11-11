@@ -1,10 +1,10 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { generateSampleContent, sampleRevisionFor } from '../src/domain/compose.ts';
-import { SAMPLE_PRODUCT } from '../src/domain/sample.ts';
-import { segmentStatus, validate } from '../src/domain/rules.ts';
-import { getProvision } from '../src/domain/sources.ts';
-import type { LocalisedContent, ProductInput, Segment } from '../src/domain/types.ts';
+import { generateSampleContent, sampleRevisionFor } from '../localise/compose.ts';
+import { SAMPLE_PRODUCT } from '../data/sample.ts';
+import { segmentStatus, validate } from '../trust/rules.ts';
+import { getProvision } from '../regulatory/sources.ts';
+import type { LocalisedContent, ProductInput, Segment } from '../data/types.ts';
 
 const product = () => structuredClone(SAMPLE_PRODUCT);
 const seg = (id: string, en: string, de: string, extra: Partial<Segment> = {}): Segment => ({
