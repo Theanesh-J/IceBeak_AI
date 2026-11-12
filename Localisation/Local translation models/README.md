@@ -97,7 +97,10 @@ It translates the supplied product category, description and claims using both
 models, then uses the existing adaptation pipeline to choose the German text.
 Text that wasn't supplied (such as marketing copy or directions) is not
 invented. Product facts and regulatory lines remain deterministic, and the
-same TrustMap checks run afterwards.
+same TrustMap checks run afterwards. Open a sentence in Review and expand
+**Model variations** to see both outputs, highlighted wording differences,
+the selected candidate, and the glossary-based selection reason.
+This is a transparent heuristic comparison, not a scored quality ranking.
 
 Start the service in one terminal and wait for the models to finish loading:
 

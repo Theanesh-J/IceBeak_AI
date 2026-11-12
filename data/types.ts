@@ -51,6 +51,14 @@ export interface Segment {
   claimRef?: string;
   factKey?: FactKey;
   origin: 'sample' | 'model' | 'local' | 'deterministic' | 'revision' | 'manual';
+  localComparison?: {
+    source: string;
+    gemma: string;
+    nllb: string;
+    selectedModel: 'gemma' | 'nllb';
+    selectionReason: string;
+    notes: string[];
+  };
   /** Set when sample mode has no translation for the English text. */
   untranslated?: boolean;
 }

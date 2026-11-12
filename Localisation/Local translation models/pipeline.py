@@ -45,6 +45,8 @@ def run_segment(segment_id, source, protected_terms=None):
         "source": source,
         "mt": {"nllb": nllb, "gemma": gem},
         "localised": result["localised"],
+        "selected_model": result["selected_model"],
+        "selection_reason": result["selection_reason"],
         "adaptation_notes": result["changes"],
         "claims_to_check": result["claims_to_check"],
         "needs_native_review": result["needs_native_review"],

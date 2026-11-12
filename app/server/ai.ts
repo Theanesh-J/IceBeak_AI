@@ -78,6 +78,10 @@ const LocalTranslationSchema = z.object({
       segment_id: z.string(),
       source: z.string(),
       localised: z.string(),
+      mt: z.object({ gemma: z.string(), nllb: z.string() }),
+      selected_model: z.enum(['gemma', 'nllb']),
+      selection_reason: z.string(),
+      adaptation_notes: z.array(z.string()),
     }),
   ),
 });
@@ -217,16 +221,27 @@ export async function generateLocalContent(body: unknown): Promise<LocalisedCont
   if (translated.some((segment) => !segment.localised.trim())) {
     throw new HttpError(502, 'The local translation service returned an empty translation.');
   }
-  const translations = new Map(translated.map((segment) => [segment.segment_id, segment.localised]));
+  const translations = new Map(translated.map((segment) => [segment.segment_id, segment]));
   if (inputs.some((input) => !translations.has(input.segment_id))) {
     throw new HttpError(502, 'The local translation service returned an incomplete result.');
   }
-  const translationFor = (id: string) => {
-    const translation = translations.get(id);
-    if (translation === undefined) throw new HttpError(502, 'The local translation service returned an incomplete result.');
-    return translation;
+  const resultFor = (id: string) => {
+    const result = translations.get(id);
+    if (result === undefined) throw new HttpError(502, 'The local translation service returned an incomplete result.');
+    return result;
   };
-  const category = product.category.trim() ? translationFor('title-category') : '';
+  const comparisonFor = (id: string) => {
+    const result = resultFor(id);
+    return {
+      source: result.source,
+      gemma: result.mt.gemma,
+      nllb: result.mt.nllb,
+      selectedModel: result.selected_model,
+      selectionReason: result.selection_reason,
+      notes: result.adaptation_notes,
+    };
+  };
+  const category = product.category.trim() ? resultFor('title-category').localised : '';
 
   const localSegment = (segment: Omit<Segment, 'origin'>): Segment => ({ ...segment, origin: 'local' });
   const segments: Segment[] = [
@@ -236,6 +251,7 @@ export async function generateLocalContent(body: unknown): Promise<LocalisedCont
       field: 'Title',
       en: [product.name, product.category, product.size].filter(Boolean).join(', '),
       de: [product.name, category, product.size].filter(Boolean).join(', '),
+      ...(product.category.trim() ? { localComparison: comparisonFor('title-category') } : {}),
     }),
     ...(product.description.trim()
       ? [
@@ -244,7 +260,8 @@ export async function generateLocalContent(body: unknown): Promise<LocalisedCont
             docType: 'listing',
             field: 'Short description',
             en: product.description,
-            de: translationFor('ls-desc'),
+            de: resultFor('ls-desc').localised,
+            localComparison: comparisonFor('ls-desc'),
           }),
         ]
       : []),
@@ -254,8 +271,9 @@ export async function generateLocalContent(body: unknown): Promise<LocalisedCont
         docType: 'listing',
         field: `Key benefit ${index + 1}`,
         en: claim.trim(),
-        de: translationFor(claimSegmentId(index)),
+        de: resultFor(claimSegmentId(index)).localised,
         claimRef: claim.trim().toLowerCase().replace(/\s+/g, ' '),
+        localComparison: comparisonFor(claimSegmentId(index)),
       }),
     ),
     { id: 'ls-size', docType: 'listing', field: 'Size', en: product.size, de: product.size, factKey: 'size', origin: 'deterministic' },

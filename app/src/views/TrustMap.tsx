@@ -418,6 +418,60 @@ function mark(text: string, triggers: string[]): ReactNode {
   );
 }
 
+type DiffPart = { text: string; changed: boolean };
+
+function diffLocalTranslations(gemma: string, nllb: string) {
+  const left = gemma.match(/\s+|[^\s]+/g) ?? [];
+  const right = nllb.match(/\s+|[^\s]+/g) ?? [];
+  const lcs = Array.from({ length: left.length + 1 }, () => new Uint16Array(right.length + 1));
+  for (let i = left.length - 1; i >= 0; i--) {
+    for (let j = right.length - 1; j >= 0; j--) {
+      lcs[i][j] = left[i] === right[j] ? lcs[i + 1][j + 1] + 1 : Math.max(lcs[i + 1][j], lcs[i][j + 1]);
+    }
+  }
+
+  const gemmaParts: DiffPart[] = [];
+  const nllbParts: DiffPart[] = [];
+  let i = 0;
+  let j = 0;
+  let changes = 0;
+  while (i < left.length || j < right.length) {
+    if (i < left.length && j < right.length && left[i] === right[j]) {
+      gemmaParts.push({ text: left[i], changed: false });
+      nllbParts.push({ text: right[j], changed: false });
+      i++;
+      j++;
+    } else {
+      if (i < left.length && (j >= right.length || lcs[i + 1][j] >= lcs[i][j + 1])) {
+        const token = left[i++];
+        gemmaParts.push({ text: token, changed: true });
+        if (!/^\s+$/.test(token)) changes++;
+      } else {
+        const token = right[j++];
+        nllbParts.push({ text: token, changed: true });
+        if (!/^\s+$/.test(token)) changes++;
+      }
+    }
+  }
+  return { gemma: gemmaParts, nllb: nllbParts, changes };
+}
+
+function ModelComparison({ title, parts, selected }: { title: string; parts: DiffPart[]; selected: boolean }) {
+  return (
+    <div className="rounded-xl bg-canvas p-3">
+      <div className="mb-1 flex items-center justify-between gap-2">
+        <p className="text-[12px] font-semibold text-ink">{title}</p>
+        {selected && <span className="rounded-full bg-teal-soft px-2 py-0.5 text-[10.5px] font-semibold text-teal-ink">Selected</span>}
+      </div>
+      <p className="text-[13px] leading-relaxed text-ink" aria-label={`${title} translation`}>
+        {parts.map((part, index) =>
+          part.changed && !/^\s+$/.test(part.text) ? <mark key={index} className="rounded bg-warn-soft text-ink">{part.text}</mark> : part.text,
+        )}
+      </p>
+    </div>
+  );
+}
+
 function DetailHeader({ icon, title, sub, onClose }: { icon: ReactNode; title: string; sub: string; onClose: () => void }) {
   return (
     <>
@@ -517,6 +571,7 @@ function SentenceDetail({ seg, queue, onSelect, onClose }: { seg: Seg; queue: Se
     [seg, fix, state.content, all],
   );
   const [applyLinked, setApplyLinked] = useState(true);
+  const modelDiff = seg.localComparison ? diffLocalTranslations(seg.localComparison.gemma, seg.localComparison.nllb) : undefined;
 
   const apply = () => {
     if (!fix) return;
@@ -564,6 +619,36 @@ function SentenceDetail({ seg, queue, onSelect, onClose }: { seg: Seg; queue: Se
           {mark(seg.en, open.map((f) => f.trigger ?? ''))}
         </p>
       </div>
+
+      {seg.localComparison && modelDiff && (
+        <div className="mx-6 mt-4 overflow-hidden rounded-2xl border border-line">
+          <Disclosure title="Model variations" count={modelDiff.changes}>
+            <p className="mb-3 text-[12.5px] text-muted">
+              {modelDiff.changes === 0 ? 'The two model outputs match.' : 'Highlighted words differ.'} Final text uses{' '}
+              {seg.localComparison.selectedModel === 'gemma' ? 'TranslateGemma' : 'NLLB-200'}.
+            </p>
+            {seg.localComparison.source && <p className="mb-3 text-[12px] text-muted">English input: {seg.localComparison.source}</p>}
+            <div className="space-y-3">
+              <ModelComparison
+                title="TranslateGemma"
+                parts={modelDiff.gemma}
+                selected={seg.localComparison.selectedModel === 'gemma'}
+              />
+              <ModelComparison
+                title="NLLB-200"
+                parts={modelDiff.nllb}
+                selected={seg.localComparison.selectedModel === 'nllb'}
+              />
+            </div>
+            <p className="mt-3 text-[12.5px] leading-relaxed text-ink-2">{seg.localComparison.selectionReason}</p>
+            {seg.localComparison.notes.length > 0 && (
+              <ul className="mt-2 list-disc space-y-1 pl-4 text-[12px] text-muted">
+                {seg.localComparison.notes.map((note) => <li key={note}>{note}</li>)}
+              </ul>
+            )}
+          </Disclosure>
+        </div>
+      )}
 
       {justFixed && (
         <div className="mx-6 mt-4 flex items-start gap-3 rounded-2xl bg-ok-soft p-4" role="status">
