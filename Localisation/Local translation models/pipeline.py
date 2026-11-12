@@ -1,6 +1,8 @@
 import json
+from adapt import adapt
 
-USE_MOCK = False  # set to False to use the real models
+USE_MOCK = True    # set to False to use the real models
+MARKET = "de"      # must match a key in adapt.MARKETS
 
 with open("glossary.json") as f:
     GLOSSARY = json.load(f)
@@ -32,16 +34,19 @@ def run_segment(segment_id, source):
         nllb = translate_nllb([protected])[0]
         gem = translate_gemma(protected)
     nllb, gem = restore(nllb, mapping), restore(gem, mapping)
+    result = adapt(source, gem, nllb, GLOSSARY, market=MARKET)
     return {
         "segment_id": segment_id,
         "source": source,
         "mt": {"nllb": nllb, "gemma": gem},
-        "localised": gem,
-        "adaptation_notes": [],
+        "localised": result["localised"],
+        "adaptation_notes": result["changes"],
+        "claims_to_check": result["claims_to_check"],
+        "needs_native_review": result["needs_native_review"],
         "reg_flags": [],
         "trust": {},
     }
 
 if __name__ == "__main__":
-    result = run_segment("listing_01", "BrandName organic face cream, handmade in England.")
-    print(json.dumps(result, indent=2, ensure_ascii=False))
+    out = run_segment("listing_01", "BrandName organic face cream, handmade in England.")
+    print(json.dumps(out, indent=2, ensure_ascii=False))

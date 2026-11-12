@@ -23,6 +23,8 @@ result = run_segment("listing_01", "BrandName organic face cream, handmade in En
   },
   "localised": "...",          // the translation we propose to ship
   "adaptation_notes": [],      // what the module changed or flagged
+  "claims_to_check": [],       // source claims that may need substantiation
+  "needs_native_review": false,
   "reg_flags": [],             // FILLED BY Module 2 (regulatory)
   "trust": {}                  // FILLED BY Module 3 (trust layer)
 }
@@ -69,23 +71,30 @@ are quick. In a UI, load the models once at startup, not per click.
   not work on Windows, Linux or Intel Macs. Teammates on other machines should
   use mock mode, or call the translator from the machine that runs it.
 - About 7 GB of free RAM for both models.
+- Both models run in the same virtual environment. Dependencies are pinned in
+  `requirements.txt`.
+
+From the repository root:
 
 ```bash
-python3 -m venv .venv && source .venv/bin/activate
-pip install torch transformers sentencepiece sacremoses accelerate mlx-lm
-huggingface-cli download facebook/nllb-200-distilled-600M
-huggingface-cli download mlx-community/translategemma-4b-it-8bit
+cd "Localisation/Translation module"
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+huggingface-cli download facebook/nllb-200-distilled-600M --local-dir models/nllb-600M
 ```
 
-The models download to `~/.cache/huggingface` and are not in the repo.
+NLLB is loaded from `models/nllb-600M`, so download it to that directory. The
+TranslateGemma model is downloaded to the Hugging Face cache automatically on
+the first real translation.
 
 ## Current status and limits
 
 - **Done:** NLLB and TranslateGemma translate English → German; glossary
   protection works; JSON output.
-- **Not built yet:** the adaptation step (`adapt.py`: picking the better
-  translation by glossary rules and flagging risky claims such as
-  "organic"). Until it's in, `adaptation_notes` is always empty.
+- `adapt.py` compares the model translations against glossary preferences,
+  selects a candidate, and flags claims that may need substantiation.
 - **German only for now.** Target language codes are hardcoded in `mt_nllb.py`
   (`deu_Latn`) and `mt_gemma.py` (`de-DE`). They will move into config once the
   market is confirmed.
