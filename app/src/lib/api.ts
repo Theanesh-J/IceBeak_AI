@@ -4,6 +4,7 @@ export interface ServerStatus {
   reachable: boolean;
   configured: boolean;
   model: string | null;
+  local: { available: boolean; model: string | null };
 }
 
 async function post<T>(url: string, body: unknown): Promise<T> {
@@ -18,13 +19,23 @@ export async function getStatus(): Promise<ServerStatus> {
     const res = await fetch('/api/status');
     if (!res.ok) throw new Error();
     const data = await res.json();
-    return { reachable: true, configured: !!data.configured, model: data.model ?? null };
+    return {
+      reachable: true,
+      configured: !!data.configured,
+      model: data.model ?? null,
+      local: {
+        available: !!data.local?.available,
+        model: data.local?.model ?? null,
+      },
+    };
   } catch {
-    return { reachable: false, configured: false, model: null };
+    return { reachable: false, configured: false, model: null, local: { available: false, model: null } };
   }
 }
 
 export const generateWithAI = (product: ProductInput) => post<LocalisedContent>('/api/generate', { product });
+
+export const generateWithLocalModels = (product: ProductInput) => post<LocalisedContent>('/api/generate-local', { product });
 
 export const reviseWithAI = (product: ProductInput, segment: Segment, findings: Finding[]) =>
   post<{ en: string; de: string; rationale: string }>('/api/revise', {

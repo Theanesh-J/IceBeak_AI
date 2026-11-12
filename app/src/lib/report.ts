@@ -19,7 +19,9 @@ export function buildMarkdownReport(state: AppState): string {
   lines.push(`- Company: ${SAMPLE_COMPANY.name}`);
   lines.push(`- Product: ${state.product.name} (${state.product.size})`);
   lines.push(`- Route: ${SAMPLE_COMPANY.homeMarket} → ${SAMPLE_COMPANY.destination}`);
-  lines.push(`- Generation mode: ${c.mode === 'ai' ? `Connected AI (${c.model})` : 'Sample scenario (prewritten content, no model inference)'}`);
+  lines.push(
+    `- Generation mode: ${c.mode === 'ai' ? `Connected AI (${c.model})` : c.mode === 'local' ? `Local models (${c.model})` : 'Sample scenario (prewritten content, no model inference)'}`,
+  );
   lines.push(`- Last check: ${v.ranAt} · ${v.rulesRun.length} deterministic rules${v.contentVersion !== state.contentVersion ? ' · WARNING: content changed after this check' : ''}`);
   lines.push('');
   lines.push(

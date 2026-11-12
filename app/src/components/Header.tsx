@@ -1,4 +1,4 @@
-import { Cpu, FileText } from 'lucide-react';
+import { Cpu, FileText, Languages } from 'lucide-react';
 import { useServer, type Route } from '../App';
 import { useStore } from '../state/store';
 
@@ -14,7 +14,11 @@ export function ModeBadge() {
   const { state } = useStore();
   const { status } = useServer();
   const mode = state.content?.mode ?? state.mode;
-  return mode === 'ai' ? (
+  return mode === 'local' ? (
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-soft px-2.5 py-0.5 text-[12px] font-medium text-teal-ink" title="Text translated by locally running models">
+      <Languages size={12} aria-hidden /> Local models · {state.content?.model ?? status?.local.model}
+    </span>
+  ) : mode === 'ai' ? (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-soft px-2.5 py-0.5 text-[12px] font-medium text-teal-ink" title="Text written by a live model">
       <Cpu size={12} aria-hidden /> Live AI · {state.content?.model ?? status?.model}
     </span>

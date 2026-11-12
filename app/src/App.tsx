@@ -32,7 +32,7 @@ export default function App() {
   const { state, dispatch } = useStore();
 
   const refresh = () => {
-    if (HOSTED) setStatus({ reachable: false, configured: false, model: null });
+    if (HOSTED) setStatus({ reachable: false, configured: false, model: null, local: { available: false, model: null } });
     else getStatus().then(setStatus);
   };
 
@@ -44,12 +44,18 @@ export default function App() {
     };
     window.addEventListener('hashchange', onHash);
     refresh();
-    return () => window.removeEventListener('hashchange', onHash);
+    const statusTimer = HOSTED ? undefined : window.setInterval(() => getStatus().then(setStatus), 5000);
+    return () => {
+      window.removeEventListener('hashchange', onHash);
+      if (statusTimer !== undefined) window.clearInterval(statusTimer);
+    };
   }, []);
 
-  // Fall back to sample mode if AI was selected but is no longer available.
+  // Keep unavailable generation modes from leaving the user on a dead option.
   useEffect(() => {
-    if (status && !status.configured && state.mode === 'ai') dispatch({ type: 'setMode', mode: 'sample' });
+    if (status && ((state.mode === 'ai' && !status.configured) || (state.mode === 'local' && !status.local.available))) {
+      dispatch({ type: 'setMode', mode: 'sample' });
+    }
   }, [status, state.mode, dispatch]);
 
   return (

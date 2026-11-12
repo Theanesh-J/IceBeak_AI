@@ -1,6 +1,7 @@
 // ProofLingo local API server. Holds the API key; the browser never sees it.
-//   GET  /api/status    → whether Live AI is available
+//   GET  /api/status    → whether Anthropic and local translation are available
 //   POST /api/generate  → structured German localisation (schema-validated)
+//   POST /api/generate-local → German translation using local Gemma + NLLB
 //   POST /api/revise    → draft a fix for a flagged sentence
 // The AI logic lives in ./ai.ts and is shared with the Netlify Function.
 
@@ -8,20 +9,32 @@ import express from 'express';
 import path from 'node:path';
 import fs from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { aiStatus, generateContent, reviseSegment, toErrorResponse } from './ai.ts';
+import { aiStatus, generateContent, generateLocalContent, localTranslatorStatus, reviseSegment, toErrorResponse } from './ai.ts';
 
 const PORT = Number(process.env.API_PORT ?? 8787);
 
 const app = express();
 app.use(express.json({ limit: '200kb' }));
 
-app.get('/api/status', (_req, res) => {
-  res.json(aiStatus());
+app.get('/api/status', async (_req, res, next) => {
+  try {
+    res.json({ ...aiStatus(), local: await localTranslatorStatus() });
+  } catch (e) {
+    next(e);
+  }
 });
 
 app.post('/api/generate', async (req, res, next) => {
   try {
     res.json(await generateContent(req.body));
+  } catch (e) {
+    next(e);
+  }
+});
+
+app.post('/api/generate-local', async (req, res, next) => {
+  try {
+    res.json(await generateLocalContent(req.body));
   } catch (e) {
     next(e);
   }
@@ -50,5 +63,5 @@ app.use((err: unknown, _req: express.Request, res: express.Response, _next: expr
 
 app.listen(PORT, () => {
   const s = aiStatus();
-  console.log(`ProofLingo API on http://localhost:${PORT} · AI mode ${s.configured ? `connected (${s.model})` : 'not configured — sample scenario only'}`);
+  console.log(`ProofLingo API on http://localhost:${PORT} · Anthropic ${s.configured ? `connected (${s.model})` : 'not configured'}`);
 });

@@ -51,6 +51,30 @@ Open http://localhost:5173. This starts the web app (Vite, port 5173) and the AP
 
 > **Note on the folder name:** this project sits in a folder whose path contains `:` (`CITY:WESTMINSTER`). A colon breaks `PATH` lookups, so the npm scripts call each tool through `node node_modules/...` directly, and Vite's strict file-serving check is relaxed only when the path contains `:`. Moving the project to a path without `:` works as well.
 
+## Use local Gemma + NLLB translation
+
+The **Local** option translates the entered product category, description and
+claims with TranslateGemma and NLLB on your computer. It does not generate
+missing marketing or usage copy. TrustMap still checks the returned text.
+
+On an Apple Silicon Mac, install the Python requirements and start the local
+service in a terminal:
+
+```bash
+cd "Localisation/Local translation models"
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+python local_server.py
+```
+
+The first startup loads the models and may download TranslateGemma. Once the
+service reports that it is ready, run `npm run dev` from `app/` in a second
+terminal. The **Local** option becomes available when the app detects the
+service on `127.0.0.1:8789`. This option is not available on the hosted demo.
+See the [local translation module instructions](../Localisation/Local%20translation%20models/README.md)
+for NLLB model setup and hardware requirements.
+
 ---
 
 ## Share online (Netlify)

@@ -1,8 +1,10 @@
+from pathlib import Path
+
 import torch
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
 
 device = "mps" if torch.backends.mps.is_available() else "cpu"
-NAME = "./models/nllb-600M"
+NAME = str(Path(__file__).parent / "models" / "nllb-600M")
 
 tok = AutoTokenizer.from_pretrained(NAME, src_lang="eng_Latn")
 model = AutoModelForSeq2SeqLM.from_pretrained(NAME).to(device)
