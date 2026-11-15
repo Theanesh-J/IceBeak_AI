@@ -50,12 +50,20 @@ export interface Segment {
   /** Normalised source claim this segment was derived from, if any. */
   claimRef?: string;
   factKey?: FactKey;
-  origin: 'sample' | 'model' | 'deterministic' | 'revision' | 'manual';
+  origin: 'sample' | 'model' | 'local' | 'deterministic' | 'revision' | 'manual';
+  localComparison?: {
+    source: string;
+    gemma: string;
+    nllb: string;
+    selectedModel: 'gemma' | 'nllb';
+    selectionReason: string;
+    notes: string[];
+  };
   /** Set when sample mode has no translation for the English text. */
   untranslated?: boolean;
 }
 
-export type GenerationMode = 'sample' | 'ai';
+export type GenerationMode = 'sample' | 'ai' | 'local';
 
 export interface LocalisedContent {
   mode: GenerationMode;

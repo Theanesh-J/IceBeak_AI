@@ -143,7 +143,9 @@ function reducer(state: AppState, action: Action): AppState {
             summary:
               action.content.mode === 'ai'
                 ? `German content created · ${action.content.segments.length} sentences written by ${action.content.model}`
-                : `German content created · ${action.content.segments.length} sentences from prewritten sample text, no model`,
+                : action.content.mode === 'local'
+                  ? `German content created · ${action.content.segments.length} sentences translated by ${action.content.model}`
+                  : `German content created · ${action.content.segments.length} sentences from prewritten sample text, no model`,
           },
           ...state.history,
         ],

@@ -1,18 +1,23 @@
 import json
+from pathlib import Path
 from adapt import adapt
 
-USE_MOCK = True    # set to False to use the real models
+USE_MOCK = False    # set to False to use the real models
 MARKET = "de"      # must match a key in adapt.MARKETS
 
-with open("glossary.json") as f:
+with (Path(__file__).parent / "glossary.json").open() as f:
     GLOSSARY = json.load(f)
 
 def mock_translate(text):
     return f"[MT] {text}"
 
-def protect(text):
+def protect(text, extra_terms=None):
     mapping = {}
-    for i, term in enumerate(GLOSSARY["do_not_translate"]):
+    terms = list(dict.fromkeys([*GLOSSARY["do_not_translate"], *(extra_terms or [])]))
+    terms.sort(key=len, reverse=True)
+    for i, term in enumerate(terms):
+        if not term:
+            continue
         token = f"[[T{i}]]"
         if term in text:
             text = text.replace(term, token)
@@ -24,8 +29,8 @@ def restore(text, mapping):
         text = text.replace(token, term)
     return text
 
-def run_segment(segment_id, source):
-    protected, mapping = protect(source)
+def run_segment(segment_id, source, protected_terms=None):
+    protected, mapping = protect(source, protected_terms)
     if USE_MOCK:
         nllb = gem = mock_translate(protected)
     else:
@@ -40,6 +45,8 @@ def run_segment(segment_id, source):
         "source": source,
         "mt": {"nllb": nllb, "gemma": gem},
         "localised": result["localised"],
+        "selected_model": result["selected_model"],
+        "selection_reason": result["selection_reason"],
         "adaptation_notes": result["changes"],
         "claims_to_check": result["claims_to_check"],
         "needs_native_review": result["needs_native_review"],

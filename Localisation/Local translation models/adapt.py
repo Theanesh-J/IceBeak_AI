@@ -54,10 +54,19 @@ def adapt(source, translation, reference, glossary, market="de"):
     pref = glossary.get("preferred", {})
 
     # 1. Choose the candidate that follows the glossary best
+    gemma_matches = count_required(translation, glossary)
+    nllb_matches = count_required(reference, glossary)
     chosen = translation
-    if count_required(reference, glossary) > count_required(translation, glossary):
+    selected_model = "gemma"
+    if nllb_matches > gemma_matches:
         chosen = reference
-        changes.append("Used the second model's translation: it follows the required glossary terms better")
+        selected_model = "nllb"
+        changes.append("Selected NLLB because it matches more required glossary terms")
+        selection_reason = "NLLB matched more required glossary terms."
+    elif gemma_matches > nllb_matches:
+        selection_reason = "TranslateGemma matched more required glossary terms."
+    else:
+        selection_reason = "Glossary matches were tied; TranslateGemma was selected as the tie-breaker."
 
     # 2. Required glossary terms
     for en_term, target in pref.items():
@@ -107,6 +116,8 @@ def adapt(source, translation, reference, glossary, market="de"):
 
     return {
         "localised": chosen,
+        "selected_model": selected_model,
+        "selection_reason": selection_reason,
         "changes": changes,
         "claims_to_check": claims,
         "needs_native_review": bool(flagged or disagree or claims),

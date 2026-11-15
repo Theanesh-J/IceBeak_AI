@@ -12,6 +12,8 @@ import type { Finding, LocalisedContent, ProductInput, Segment } from '../../dat
 
 const model = () => process.env.PROOFLINGO_MODEL ?? 'claude-opus-5-5';
 const isConfigured = () => Boolean(process.env.ANTHROPIC_API_KEY || process.env.ANTHROPIC_AUTH_TOKEN);
+const LOCAL_TRANSLATOR_URL = 'http://127.0.0.1:8789';
+const LOCAL_MODEL = 'TranslateGemma 4B + NLLB-200 600M';
 
 let client: Anthropic | null = null;
 function getClient() {
@@ -70,6 +72,20 @@ const ProductSchema = z.object({
   targetCountry: z.literal('DE'),
 });
 
+const LocalTranslationSchema = z.object({
+  segments: z.array(
+    z.object({
+      segment_id: z.string(),
+      source: z.string(),
+      localised: z.string(),
+      mt: z.object({ gemma: z.string(), nllb: z.string() }),
+      selected_model: z.enum(['gemma', 'nllb']),
+      selection_reason: z.string(),
+      adaptation_notes: z.array(z.string()),
+    }),
+  ),
+});
+
 // ---------- prompts ----------
 
 const GENERATION_SYSTEM = `You localise UK cosmetic product content for the German market.
@@ -126,6 +142,36 @@ export function aiStatus() {
   return { configured, model: configured ? model() : null };
 }
 
+export async function localTranslatorStatus() {
+  try {
+    const response = await fetch(`${LOCAL_TRANSLATOR_URL}/health`, { signal: AbortSignal.timeout(1500) });
+    if (!response.ok) return { available: false, model: null };
+    const health = z.object({ ready: z.boolean(), model: z.string() }).parse(await response.json());
+    return { available: health.ready, model: health.ready ? health.model : null };
+  } catch {
+    return { available: false, model: null };
+  }
+}
+
+async function translateLocally(segments: Array<{ segment_id: string; source: string }>, productName: string) {
+  let response: Response;
+  try {
+    response = await fetch(`${LOCAL_TRANSLATOR_URL}/translate`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ segments, protected_terms: [productName] }),
+    });
+  } catch {
+    throw new HttpError(503, 'Local translation models are not running. Start the local translation service and try again.');
+  }
+  const body: unknown = await response.json().catch(() => undefined);
+  if (!response.ok) {
+    const error = z.object({ error: z.string() }).safeParse(body);
+    throw new HttpError(response.status >= 500 ? 502 : response.status, error.success ? error.data.error : 'Local translation failed.');
+  }
+  return LocalTranslationSchema.parse(body).segments;
+}
+
 export async function generateContent(body: unknown): Promise<LocalisedContent> {
   const product = ProductSchema.parse((body as { product?: unknown })?.product) as ProductInput;
   const out = await callModel(GENERATION_SYSTEM, productBrief(product), GenerationSchema);
@@ -161,6 +207,80 @@ export async function generateContent(body: unknown): Promise<LocalisedContent> 
   ];
 
   return { mode: 'ai', model: model(), generatedAt: new Date().toISOString(), segments };
+}
+
+export async function generateLocalContent(body: unknown): Promise<LocalisedContent> {
+  const product = ProductSchema.parse((body as { product?: unknown })?.product) as ProductInput;
+  const claims = product.claims.filter((claim) => claim.trim());
+  const inputs = [
+    ...(product.category.trim() ? [{ segment_id: 'title-category', source: product.category.trim() }] : []),
+    ...(product.description.trim() ? [{ segment_id: 'ls-desc', source: product.description.trim() }] : []),
+    ...claims.map((claim, index) => ({ segment_id: claimSegmentId(index), source: claim.trim() })),
+  ];
+  const translated = inputs.length ? await translateLocally(inputs, product.name) : [];
+  if (translated.some((segment) => !segment.localised.trim())) {
+    throw new HttpError(502, 'The local translation service returned an empty translation.');
+  }
+  const translations = new Map(translated.map((segment) => [segment.segment_id, segment]));
+  if (inputs.some((input) => !translations.has(input.segment_id))) {
+    throw new HttpError(502, 'The local translation service returned an incomplete result.');
+  }
+  const resultFor = (id: string) => {
+    const result = translations.get(id);
+    if (result === undefined) throw new HttpError(502, 'The local translation service returned an incomplete result.');
+    return result;
+  };
+  const comparisonFor = (id: string) => {
+    const result = resultFor(id);
+    return {
+      source: result.source,
+      gemma: result.mt.gemma,
+      nllb: result.mt.nllb,
+      selectedModel: result.selected_model,
+      selectionReason: result.selection_reason,
+      notes: result.adaptation_notes,
+    };
+  };
+  const category = product.category.trim() ? resultFor('title-category').localised : '';
+
+  const localSegment = (segment: Omit<Segment, 'origin'>): Segment => ({ ...segment, origin: 'local' });
+  const segments: Segment[] = [
+    localSegment({
+      id: 'ls-title',
+      docType: 'listing',
+      field: 'Title',
+      en: [product.name, product.category, product.size].filter(Boolean).join(', '),
+      de: [product.name, category, product.size].filter(Boolean).join(', '),
+      ...(product.category.trim() ? { localComparison: comparisonFor('title-category') } : {}),
+    }),
+    ...(product.description.trim()
+      ? [
+          localSegment({
+            id: 'ls-desc',
+            docType: 'listing',
+            field: 'Short description',
+            en: product.description,
+            de: resultFor('ls-desc').localised,
+            localComparison: comparisonFor('ls-desc'),
+          }),
+        ]
+      : []),
+    ...claims.map((claim, index) =>
+      localSegment({
+        id: claimSegmentId(index),
+        docType: 'listing',
+        field: `Key benefit ${index + 1}`,
+        en: claim.trim(),
+        de: resultFor(claimSegmentId(index)).localised,
+        claimRef: claim.trim().toLowerCase().replace(/\s+/g, ' '),
+        localComparison: comparisonFor(claimSegmentId(index)),
+      }),
+    ),
+    { id: 'ls-size', docType: 'listing', field: 'Size', en: product.size, de: product.size, factKey: 'size', origin: 'deterministic' },
+    { id: 'pi-name', docType: 'info', field: 'Product name', en: product.name, de: product.name, origin: 'deterministic' },
+    ...buildRegulatorySegments(product),
+  ];
+  return { mode: 'local', model: LOCAL_MODEL, generatedAt: new Date().toISOString(), segments };
 }
 
 export async function reviseSegment(body: unknown) {

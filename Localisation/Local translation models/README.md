@@ -46,10 +46,10 @@ without telling the team.
 
 ## Mock mode (no models needed)
 
-`pipeline.py` has `USE_MOCK = True` by default. In mock mode it returns fake
-translations like `[MT] ...` in the same JSON shape, instantly. **Build and
-test your module against mock mode.** Only the machine running the real
-translation needs the models.
+Set `USE_MOCK = True` in `pipeline.py` to return fake translations like
+`[MT] ...` instantly. The checked-in setting is `False`, so the real models
+are used. **Build and test your module against mock mode** when the models
+aren't available.
 
 Set `USE_MOCK = False` to use the real models.
 
@@ -62,8 +62,8 @@ Set `USE_MOCK = False` to use the real models.
 4. **Output:** the JSON above. For now `localised` is the TranslateGemma
    output.
 
-The first call loads both models and takes about a minute. After that, calls
-are quick. In a UI, load the models once at startup, not per click.
+The local app service loads both models at startup and keeps them in memory
+between translation requests.
 
 ## Requirements and setup (real mode only)
 
@@ -77,17 +77,49 @@ are quick. In a UI, load the models once at startup, not per click.
 From the repository root:
 
 ```bash
-cd "Localisation/Translation module"
+cd "Localisation/Local translation models"
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
+python -m pip install "huggingface_hub[cli]"
 huggingface-cli download facebook/nllb-200-distilled-600M --local-dir models/nllb-600M
 ```
 
 NLLB is loaded from `models/nllb-600M`, so download it to that directory. The
 TranslateGemma model is downloaded to the Hugging Face cache automatically on
 the first real translation.
+
+## Use the local models in the app
+
+The app's **Local** generation option calls this service on the same computer.
+It translates the supplied product category, description and claims using both
+models, then uses the existing adaptation pipeline to choose the German text.
+Text that wasn't supplied (such as marketing copy or directions) is not
+invented. Product facts and regulatory lines remain deterministic, and the
+same TrustMap checks run afterwards. Open a sentence in Review and expand
+**Model variations** to see both outputs, highlighted wording differences,
+the selected candidate, and the glossary-based selection reason.
+This is a transparent heuristic comparison, not a scored quality ranking.
+
+Start the service in one terminal and wait for the models to finish loading:
+
+```bash
+cd "Localisation/Local translation models"
+source .venv/bin/activate
+python local_server.py
+```
+
+Then start the app in another terminal:
+
+```bash
+cd app
+npm run dev
+```
+
+The service listens only on `127.0.0.1:8789`. The app enables **Local** when
+that service is ready. This mode is local-only; it is not available on Netlify.
+Stop the service with Ctrl+C when finished.
 
 ## Current status and limits
 

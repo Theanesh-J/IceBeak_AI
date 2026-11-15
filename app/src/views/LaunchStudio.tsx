@@ -1,9 +1,9 @@
 import { useState } from 'react';
-import { ArrowRight, Check, Cpu, FileText, Loader2, Pencil, Plus, RotateCcw, Trash2, TriangleAlert } from 'lucide-react';
+import { ArrowRight, Check, Cpu, FileText, Languages, Loader2, Pencil, Plus, RotateCcw, Trash2, TriangleAlert } from 'lucide-react';
 import { navigate, useServer } from '../App';
 import { generateSampleContent } from '../../../localise/compose';
 import type { EvidenceItem, EvidenceKind, ProductInput } from '../../../data/types';
-import { generateWithAI } from '../lib/api';
+import { generateWithAI, generateWithLocalModels } from '../lib/api';
 import { useStore } from '../state/store';
 import { HOSTED } from '../lib/env';
 import { splitCounts } from '../../../trust/rules';
@@ -293,6 +293,7 @@ function GeneratePanel() {
   const [error, setError] = useState<string | null>(null);
   const ready = !!p.name.trim() && !!p.size.trim() && p.claims.some((c) => c.trim());
   const aiAvailable = !!status?.configured;
+  const localAvailable = !HOSTED && !!status?.local.available;
   const counts = state.content && state.validation ? splitCounts(state.validation.findings, state.content.segments) : null;
   const fresh = counts && !state.productChangedSinceGeneration;
 
@@ -305,7 +306,8 @@ function GeneratePanel() {
     }
     setBusy(true);
     try {
-      dispatch({ type: 'setContent', content: await generateWithAI(product) });
+      const content = state.mode === 'ai' ? await generateWithAI(product) : await generateWithLocalModels(product);
+      dispatch({ type: 'setContent', content });
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Generation failed.');
     } finally {
@@ -351,13 +353,18 @@ function GeneratePanel() {
       ) : (
         <>
           <h2 className="text-[18px] font-semibold tracking-tight">Create the German version</h2>
-          <p className="mt-1 text-[14px] leading-relaxed text-muted">A product listing, marketing copy and product information, each checked straight away.</p>
+          <p className="mt-1 text-[14px] leading-relaxed text-muted">
+            {state.mode === 'local'
+              ? 'Translate the supplied product text locally, then check it straight away. No new marketing copy is invented.'
+              : 'A product listing, marketing copy and product information, each checked straight away.'}
+          </p>
 
-          <div className="mt-5 grid grid-cols-2 gap-1 rounded-lg bg-canvas p-1" role="radiogroup" aria-label="How to write the German text">
+          <div className="mt-5 grid grid-cols-3 gap-1 rounded-lg bg-canvas p-1" role="radiogroup" aria-label="How to write the German text">
             {(
               [
                 { mode: 'sample', label: 'Sample', Icon: FileText, disabled: false },
                 { mode: 'ai', label: 'Live AI', Icon: Cpu, disabled: !aiAvailable },
+                { mode: 'local', label: 'Local', Icon: Languages, disabled: !localAvailable },
               ] as const
             ).map(({ mode, label, Icon, disabled }) => (
               <button
@@ -379,8 +386,12 @@ function GeneratePanel() {
           <p className="mt-2 text-[13px] leading-relaxed text-muted">
             {state.mode === 'sample'
               ? 'Uses prewritten German for the example. Works offline, no model runs.'
-              : `Writes the German with ${status?.model}. The checks are the same either way.`}
+              : state.mode === 'ai'
+                ? `Writes the German with ${status?.model}. The checks are the same either way.`
+                : `Translates supplied product text with ${status?.local.model ?? 'local Gemma + NLLB models'}. Marketing copy is not invented.`}
             {!aiAvailable && status && (HOSTED ? ' Live AI runs in the local version only.' : ' Live AI needs an API key on the server.')}
+            {!localAvailable && !HOSTED && status && ' Local models need the translation service running on this computer.'}
+            {HOSTED && state.mode === 'local' && ' Local models run in the local version only.'}
           </p>
 
           {state.productChangedSinceGeneration && (
@@ -396,7 +407,7 @@ function GeneratePanel() {
 
           <Button variant="primary" size="lg" className="mt-5 w-full" disabled={!ready || busy} onClick={generate}>
             {busy && <Loader2 size={16} className="animate-spin" aria-hidden />}
-            {busy ? `Writing with ${status?.model}…` : 'Generate German content'}
+            {busy ? `Writing with ${state.mode === 'local' ? status?.local.model ?? 'local models' : status?.model ?? 'AI'}…` : 'Generate German content'}
           </Button>
           {!ready && <p className="mt-2 text-center text-[12.5px] text-muted">Add a name, size and at least one claim.</p>}
         </>
